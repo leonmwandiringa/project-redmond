@@ -1,19 +1,28 @@
 {
-    "resources_name": "",
-    "resources": [
+    "services_name": "supermsc",
+    "services": [
         {
-            "group_name": "services",
             "artifacts": [
                 {
                     "artifact_name": "gateway",
                     "artifact_type": "image",
-                    "artifact_source": "",
-                    "ports":["3000:5000"]
+                    "artifact_registry_repository": "",
+                    "artifact_source": "redis",
+                    "ports":["3000:5000"],
+                    "artifact_enviroment_variables":{
+
+                    },
+                    "artifact_policies": {
+
+                    }
                 }
             ]
         }
     ],
-    "resources_policy": {
+    "servicess_policies": {
 
-    } 
+    },
+    "global_enviroment_variables": {
+
+    }
 }
