@@ -1,0 +1,19 @@
+{
+    "resources_name": "",
+    "resources": [
+        {
+            "group_name": "services",
+            "artifacts": [
+                {
+                    "artifact_name": "gateway",
+                    "artifact_type": "image",
+                    "artifact_source": "",
+                    "ports":["3000:5000"]
+                }
+            ]
+        }
+    ],
+    "resources_policy": {
+
+    } 
+}
