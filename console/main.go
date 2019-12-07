@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -11,7 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kalekin/envcheck"
+	"github.com/leontinashe/kalekin/build"
+	"github.com/leontinashe/kalekin/validation"
 	"github.com/urfave/cli"
 )
 
@@ -53,16 +53,20 @@ func main() {
 			Name:  "run",
 			Usage: "runs current deployment",
 			Action: func(c *cli.Context) error {
-				// if !dockerEnvCheck() {
-				// 	return nil
-				// }
-				if !envcheck.ValidateEnv() {
+
+				buildValidation := validation.Props{
+					Type:     "json",
+					Location: "Kalekin.json",
+				}
+				if !buildValidation.ValidateEnv() {
 					return nil
 				}
-				configContents, err := envcheck.ValidateFile()
+
+				configContents, err := buildValidation.ValidateFile()
 				if err != nil {
 					return nil
 				}
+
 				runContainers(configContents)
 				return nil
 			},
@@ -82,18 +86,31 @@ func main() {
 	}
 }
 
-func runContainers(config []byte) error {
-	var loadContent Kalekin
-	err := json.Unmarshal(config, &loadContent)
-	if err != nil {
-		log.Fatalf("Error: an error occured converting config contents\r\n %", err)
-		return err
+func runContainers(config validation.Kalekin) error {
+	// var cmd
+	for _, image := range config.Services {
+		imageBuild := build.Definition{
+			Type:       image.Artifact_type,
+			Name:       image.Artifact_name,
+			Repository: image.Artifact_registry_repository,
+			Source:     image.Artifact_source,
+			Ports:      image.Artifact_ports,
+			// Enviroment: image.Artifact_enviroment_variables,
+			// Policies:   image.Artifact_enviroment_variables,
+		}
+		stdnWriter(imageBuild.BuildContainer(config.Services_name))
 	}
-	fmt.Printf("%s", loadContent.Services[0].Artifact_name)
-
-	for _, container := range loadContent.Services {
-		cmd := exec.Command("docker", "run", "-d", "--name", loadContent.Services_name+"_"+container.Artifact_name, container.Artifact_source)
-		stdnWriter(cmd)
+	for _, container := range config.Services {
+		containerBuild := build.Definition{
+			Type:       container.Artifact_type,
+			Name:       container.Artifact_name,
+			Repository: container.Artifact_registry_repository,
+			Source:     container.Artifact_source,
+			Ports:      container.Artifact_ports,
+			// Enviroment: image.Artifact_enviroment_variables,
+			// Policies:   image.Artifact_enviroment_variables,
+		}
+		stdnWriter(containerBuild.RunContainer(config.Services_name))
 	}
 	return nil
 }
@@ -130,5 +147,5 @@ func stdnWriter(cmd *exec.Cmd) {
 		log.Fatal("failed to capture stdout or stderr\n")
 	}
 	outStr, errStr := string(stdoutBuf.Bytes()), string(stderrBuf.Bytes())
-	fmt.Printf("\nout:\n%s\nerr:\n%s\n", outStr, errStr)
+	fmt.Sprintf("\nout:\n%s\nerr:\n%s\n", outStr, errStr)
 }

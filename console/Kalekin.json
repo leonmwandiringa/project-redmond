@@ -3,7 +3,7 @@
     "services": [
         {
             "artifact_name": "db",
-            "artifact_type": "image",
+            "artifact_type": "service",
             "artifact_registry_repository": "",
             "artifact_source": "mysql",
             "artifact_ports":["3000:5000"],
@@ -18,10 +18,10 @@
         },
         {
             "artifact_name": "gateway1",
-            "artifact_type": "image",
+            "artifact_type": "service",
             "artifact_registry_repository": "",
             "artifact_source": "alpine",
-            "artifact_ports":["3000:5000"],
+            "artifact_ports":["3100:5000"],
             "artifact_enviroment_variables":[{
                 "key": "",
                 "value": ""
