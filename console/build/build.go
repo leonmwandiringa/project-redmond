@@ -22,7 +22,7 @@ type KeyVal struct {
 func (image *Definition) BuildContainer(Services_name string) *exec.Cmd {
 	var cmd *exec.Cmd
 	if image.Type == "build" {
-		cmd = exec.Command("docker", "build", "-t", Services_name+"."+image.Name, "-f", image.Source, ".")
+		cmd = exec.Command("docker", "build", "-t", Services_name+"."+image.Name, "-f", image.Source+"/Dockerfile", ".")
 	} else if image.Type == "service" {
 		cmd = exec.Command("docker", "pull", image.Source)
 	}
@@ -31,6 +31,7 @@ func (image *Definition) BuildContainer(Services_name string) *exec.Cmd {
 
 func (image *Definition) RunContainer(Services_name string) *exec.Cmd {
 	var cmd *exec.Cmd
+	exec.Command("docker", "container", "rm", "-f", Services_name+"_"+image.Name).Run()
 	if image.Type == "build" {
 		cmd = exec.Command("docker", "run", "-d", "-p", containerPorts(image.Ports), "--name", Services_name+"_"+image.Name, Services_name+"."+image.Name)
 	} else if image.Type == "service" {
