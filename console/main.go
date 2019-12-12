@@ -13,6 +13,7 @@ import (
 	"github.com/leontinashe/kalekin/build"
 	"github.com/leontinashe/kalekin/validation"
 	"github.com/urfave/cli"
+	"github.com/fatih/color"
 )
 
 type Kalekin struct {
@@ -76,7 +77,9 @@ func main() {
 		if isSubcommand {
 			return err
 		}
+		color.Set(color.FgRed, color.Bold)
 		fmt.Fprintf(c.App.Writer, "Error: an unknown error occured\r\n")
+		color.Unset()
 		return nil
 	}
 
@@ -112,6 +115,18 @@ func runContainers(config validation.Kalekin) error {
 		}
 		stdnWriter(containerBuild.RunContainer(config.Services_name))
 	}
+	for _, container := range config.Services {
+		containerBuild := build.Definition{
+			Type:       container.Artifact_type,
+			Name:       container.Artifact_name,
+			Repository: container.Artifact_registry_repository,
+			Source:     container.Artifact_source,
+			Ports:      container.Artifact_ports,
+			// Enviroment: image.Artifact_enviroment_variables,
+			// Policies:   image.Artifact_enviroment_variables,
+		}
+		containerBuild.CheckIfContainerRunning(config.Services_name)
+	}
 	return nil
 }
 
@@ -125,7 +140,9 @@ func stdnWriter(cmd *exec.Cmd) {
 	stderr := io.MultiWriter(os.Stderr, &stderrBuf)
 	err := cmd.Start()
 	if err != nil {
+		color.Set(color.FgRed, color.Bold)
 		log.Fatalf("cmd.Start() failed with '%s'\n", err)
+		color.Unset()
 	}
 
 	var wg sync.WaitGroup
@@ -141,10 +158,14 @@ func stdnWriter(cmd *exec.Cmd) {
 
 	err = cmd.Wait()
 	if err != nil {
+		color.Set(color.FgRed, color.Bold)
 		log.Fatalf("cmd.Run() failed with %s\n", err)
+		color.Unset()
 	}
 	if errStdout != nil || errStderr != nil {
+		color.Set(color.FgRed, color.Bold)
 		log.Fatal("failed to capture stdout or stderr\n")
+		color.Unset()
 	}
 	outStr, errStr := string(stdoutBuf.Bytes()), string(stderrBuf.Bytes())
 	fmt.Sprintf("\nout:\n%s\nerr:\n%s\n", outStr, errStr)
