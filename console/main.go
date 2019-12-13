@@ -10,10 +10,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/leontinashe/kalekin/build"
 	"github.com/leontinashe/kalekin/validation"
 	"github.com/urfave/cli"
-	"github.com/fatih/color"
 )
 
 type Kalekin struct {
@@ -51,8 +51,8 @@ func main() {
 	app.Usage = "Containers management"
 	app.Commands = []cli.Command{
 		{
-			Name:  "run",
-			Usage: "runs current deployment",
+			Name:  "start",
+			Usage: "runs deployment",
 			Action: func(c *cli.Context) error {
 
 				buildValidation := validation.Props{
@@ -69,6 +69,28 @@ func main() {
 				}
 
 				runContainers(configContents)
+				return nil
+			},
+		},
+		{
+			Name:  "stop",
+			Usage: "stops deployment",
+			Action: func(c *cli.Context) error {
+
+				buildValidation := validation.Props{
+					Type:     "json",
+					Location: "Kalekin.json",
+				}
+				if !buildValidation.ValidateEnv() {
+					return nil
+				}
+
+				configContents, err := buildValidation.ValidateFile()
+				if err != nil {
+					return nil
+				}
+
+				stopContainers(configContents)
 				return nil
 			},
 		},
@@ -125,7 +147,37 @@ func runContainers(config validation.Kalekin) error {
 			// Enviroment: image.Artifact_enviroment_variables,
 			// Policies:   image.Artifact_enviroment_variables,
 		}
-		containerBuild.CheckIfContainerRunning(config.Services_name)
+		containerBuild.CheckIfContainerRunning(config.Services_name, "running")
+	}
+	return nil
+}
+
+func stopContainers(config validation.Kalekin) error {
+	// var cmd
+	for _, image := range config.Services {
+		imageBuild := build.Definition{
+			Type:       image.Artifact_type,
+			Name:       image.Artifact_name,
+			Repository: image.Artifact_registry_repository,
+			Source:     image.Artifact_source,
+			Ports:      image.Artifact_ports,
+			// Enviroment: image.Artifact_enviroment_variables,
+			// Policies:   image.Artifact_enviroment_variables,
+		}
+		stdnWriter(imageBuild.StopContainer(config.Services_name))
+	}
+
+	for _, container := range config.Services {
+		containerBuild := build.Definition{
+			Type:       container.Artifact_type,
+			Name:       container.Artifact_name,
+			Repository: container.Artifact_registry_repository,
+			Source:     container.Artifact_source,
+			Ports:      container.Artifact_ports,
+			// Enviroment: image.Artifact_enviroment_variables,
+			// Policies:   image.Artifact_enviroment_variables,
+		}
+		containerBuild.CheckIfContainerRunning(config.Services_name, "stopped")
 	}
 	return nil
 }

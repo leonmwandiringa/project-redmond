@@ -6,7 +6,22 @@
             "artifact_type": "service",
             "artifact_registry_repository": "",
             "artifact_source": "redis",
-            "artifact_ports":["3000:5000"],
+            "artifact_ports":[],
+            "artifact_enviroment_variables":[{
+                "key": "",
+                "value": ""
+            }],
+            "artifact_policies": [{
+                "key": "",
+                "value": ""
+            }]
+        },
+        {
+            "artifact_name": "mongo",
+            "artifact_type": "service",
+            "artifact_registry_repository": "",
+            "artifact_source": "mongo",
+            "artifact_ports":[],
             "artifact_enviroment_variables":[{
                 "key": "",
                 "value": ""

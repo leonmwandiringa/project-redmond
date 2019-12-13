@@ -3,6 +3,7 @@ package build
 import (
 	"fmt"
 	"os/exec"
+
 	"github.com/fatih/color"
 )
 
@@ -55,18 +56,30 @@ func (image *Definition) RunContainer(Services_name string) *exec.Cmd {
 	return cmd
 }
 
-func (image *Definition) CheckIfContainerRunning(Services_name string) {
-
-	containerRunning, _ := exec.Command("docker", "inspect", "-f", "'{{.State.Running}}'",  Services_name+"_"+image.Name).CombinedOutput()
-	if(string(containerRunning)[1:5] == "true"){
-		color.Set(color.FgGreen, color.Bold)
-		fmt.Printf("\n %s is Running\r\n", Services_name+"_"+image.Name)
-		color.Unset()
-	}else{
-		color.Set(color.FgRed, color.Bold)
-		fmt.Printf("\n %s failed to start\r\n", Services_name+"_"+image.Name)
-		color.Unset()
+func (image *Definition) CheckIfContainerRunning(Services_name string, isStarted string) {
+	containerRunning, _ := exec.Command("docker", "inspect", "-f", "'{{.State.Running}}'", Services_name+"_"+image.Name).CombinedOutput()
+	if string(containerRunning)[1:5] == "true" {
+		if isStarted == "running" {
+			color.Set(color.FgGreen, color.Bold)
+			fmt.Printf("\n %s is Running\r\n", Services_name+"_"+image.Name)
+			color.Unset()
+		} else if isStarted == "stopped" {
+			color.Set(color.FgRed, color.Bold)
+			fmt.Printf("\n %s failed to stop\r\n", Services_name+"_"+image.Name)
+			color.Unset()
+		}
+	} else {
+		if isStarted == "running" {
+			color.Set(color.FgRed, color.Bold)
+			fmt.Printf("\n %s failed to start\r\n", Services_name+"_"+image.Name)
+			color.Unset()
+		} else if isStarted == "stopped" {
+			color.Set(color.FgGreen, color.Bold)
+			fmt.Printf("\n %s was stopped successfully\r\n", Services_name+"_"+image.Name)
+			color.Unset()
+		}
 	}
+
 }
 
 func containerPorts(ports []string) string {
