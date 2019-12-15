@@ -1,4 +1,4 @@
-module github.com/leontinashe/kalekin
+module github.com/leontinashe/dopr
 
 go 1.13
 

@@ -14,7 +14,7 @@ type Props struct {
 	Location string
 }
 
-type Kalekin struct {
+type Dopr struct {
 	Services_name string     `json:"services_name"`
 	Services      []Artifact `json:"services"`
 }
@@ -44,8 +44,8 @@ func (props *Props) ValidateEnv() bool {
 	return dockerErr == nil
 }
 
-func (props *Props) ValidateFile() (Kalekin, error) {
-	var contents Kalekin
+func (props *Props) ValidateFile() (Dopr, error) {
+	var contents Dopr
 	configFile, err := os.Open(props.Location)
 	defer configFile.Close()
 	if err != nil {

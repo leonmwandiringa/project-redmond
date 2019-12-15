@@ -11,12 +11,12 @@ import (
 	"time"
 
 	"github.com/fatih/color"
-	"github.com/leontinashe/kalekin/build"
-	"github.com/leontinashe/kalekin/validation"
+	"github.com/leontinashe/dopr/build"
+	"github.com/leontinashe/dopr/validation"
 	"github.com/urfave/cli"
 )
 
-type Kalekin struct {
+type Dopr struct {
 	Services_name string     `json:"services_name"`
 	Services      []Artifact `json:"services"`
 }
@@ -38,7 +38,7 @@ type KeyVal struct {
 
 func main() {
 	app := cli.NewApp()
-	app.Name = "Kalekin"
+	app.Name = "Dopr"
 	app.Version = "0.1"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
@@ -47,7 +47,7 @@ func main() {
 			Email: "leonmwandiringa@gmail.com",
 		},
 	}
-	app.Copyright = "(c) 2019 Kalekin (project redmond)"
+	app.Copyright = "(c) 2019 Dopr"
 	app.Usage = "Containers management"
 	app.Commands = []cli.Command{
 		{
@@ -57,7 +57,7 @@ func main() {
 
 				buildValidation := validation.Props{
 					Type:     "json",
-					Location: "Kalekin.json",
+					Location: "Dopr.json",
 				}
 				if !buildValidation.ValidateEnv() {
 					return nil
@@ -79,7 +79,7 @@ func main() {
 
 				buildValidation := validation.Props{
 					Type:     "json",
-					Location: "Kalekin.json",
+					Location: "Dopr.json",
 				}
 				if !buildValidation.ValidateEnv() {
 					return nil
@@ -111,7 +111,7 @@ func main() {
 	}
 }
 
-func runContainers(config validation.Kalekin) error {
+func runContainers(config validation.Dopr) error {
 	// var cmd
 	for _, image := range config.Services {
 		imageBuild := build.Definition{
@@ -152,7 +152,7 @@ func runContainers(config validation.Kalekin) error {
 	return nil
 }
 
-func stopContainers(config validation.Kalekin) error {
+func stopContainers(config validation.Dopr) error {
 	// var cmd
 	for _, image := range config.Services {
 		imageBuild := build.Definition{

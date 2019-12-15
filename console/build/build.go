@@ -37,7 +37,7 @@ func (image *Definition) BuildContainer(Services_name string) *exec.Cmd {
 }
 
 func (image *Definition) RunContainer(Services_name string) *exec.Cmd {
-	var cmd *exec.Cmd
+
 	color.Set(color.FgMagenta, color.Bold)
 	fmt.Printf("\n Stopping running %s container \r\n", Services_name+"_"+image.Name)
 	color.Unset()
@@ -48,12 +48,17 @@ func (image *Definition) RunContainer(Services_name string) *exec.Cmd {
 	fmt.Printf("\n starting %s container \r\n", Services_name+"_"+image.Name)
 	color.Unset()
 
+	var cmd *exec.Cmd
+	portsToRun := containerCommand(image.Ports)
 	if image.Type == "build" {
-		cmd = exec.Command("docker", "run", "-d", "-p", containerPorts(image.Ports), "--name", Services_name+"_"+image.Name, Services_name+"."+image.Name)
+		commandTr := append(portsToRun, "--name", Services_name+"_"+image.Name, Services_name+"."+image.Name)
+		cmd = exec.Command("docker", commandTr...)
 	} else if image.Type == "service" {
-		cmd = exec.Command("docker", "run", "-d", "-p", containerPorts(image.Ports), "--name", Services_name+"_"+image.Name, image.Source)
+		commandTr := append(portsToRun, "--name", Services_name+"_"+image.Name, image.Source)
+		cmd = exec.Command("docker", commandTr...)
 	}
 	return cmd
+
 }
 
 func (image *Definition) CheckIfContainerRunning(Services_name string, isStarted string) {
@@ -82,10 +87,23 @@ func (image *Definition) CheckIfContainerRunning(Services_name string, isStarted
 
 }
 
-func containerPorts(ports []string) string {
-	var portsToRun string = ""
-	for _, port := range ports {
-		portsToRun += port
+func (image *Definition) StopContainer(Services_name string) *exec.Cmd {
+	var cmd *exec.Cmd
+	color.Set(color.FgMagenta, color.Bold)
+	fmt.Printf("\n Stopping running %s container \r\n", Services_name+"_"+image.Name)
+	color.Unset()
+
+	cmd = exec.Command("docker", "container", "stop", Services_name+"_"+image.Name)
+	return cmd
+}
+
+func containerCommand(ports []string) []string {
+	containerToRun := []string{"run", "-d"}
+	if len(ports) < 1 {
+		return containerToRun
 	}
-	return portsToRun
+	for _, port := range ports {
+		containerToRun = append(containerToRun, "-p", port)
+	}
+	return containerToRun
 }
