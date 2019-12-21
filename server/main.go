@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/leontinashe/doprserver/data"
 	"github.com/leontinashe/doprserver/services"
 	"net/http"
 )
@@ -12,6 +14,10 @@ type User struct{
 	Password string `json: "password"`
 }
 
+func init(){
+	fmt.Print("running in init")
+	data.Connect()
+}
 func main(){
 	r := gin.New()
 	r.Use(gin.Logger())

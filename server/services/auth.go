@@ -67,7 +67,7 @@ func SignUserIn(username string, password string) (User, string, error){
  */
 func getUser(username string, password string) (User, error){
 	var user User
-	userFound := data.Client().Database("doprtest").Collection("users").FindOne(context.TODO(), bson.M{"username": username, "password": password})
+	userFound := data.Client.Database("doprtest").Collection("users").FindOne(context.TODO(), bson.M{"username": username, "password": password})
 	if decodeErr := userFound.Decode(&user); decodeErr != nil{
 		return user, decodeErr
 	}
@@ -81,7 +81,7 @@ func RegisterUser(username, password, email string) (bool, error){
 		return false, errors.New("User already exists")
 	}
 
-	inserted, insertErr := data.Client().Database("doprtest").Collection("users").InsertOne(context.TODO(), bson.M{"username":username, "password":password, "email":email})
+	inserted, insertErr := data.Client.Database("doprtest").Collection("users").InsertOne(context.TODO(), bson.M{"username":username, "password":password, "email":email})
 	fmt.Print(inserted)
 	if insertErr != nil{
 		return false, insertErr
@@ -91,7 +91,7 @@ func RegisterUser(username, password, email string) (bool, error){
 
 func userExists(username, password, email string) (User, error){
 	var user User
-	userFound := data.Client().Database("doprtest").Collection("users").FindOne(context.TODO(), bson.M{"username": username, "password": password, "email": email})
+	userFound := data.Client.Database("doprtest").Collection("users").FindOne(context.TODO(), bson.M{"username": username, "password": password, "email": email})
 	if decodeErr := userFound.Decode(&user); decodeErr != nil{
 		return user, decodeErr
 	}
