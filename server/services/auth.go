@@ -1,12 +1,10 @@
 package services
 
 import (
-	"context"
 	"errors"
-	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/leontinashe/doprserver/data"
-	"go.mongodb.org/mongo-driver/bson"
+	"gopkg.in/mgo.v2/bson"
 	"time"
 )
 
@@ -18,6 +16,7 @@ type Claims struct {
 }
 
 type User struct{
+	ID       bson.ObjectId `json:"id" bson:"_id,omitempty"`
 	Username string `json: "username"`
 	Email string `json: "email"`
 	Password string `json: "password"`
@@ -67,35 +66,36 @@ func SignUserIn(username string, password string) (User, string, error){
  */
 func getUser(username string, password string) (User, error){
 	var user User
-	userFound := data.Client.Database("doprtest").Collection("users").FindOne(context.TODO(), bson.M{"username": username, "password": password})
-	if decodeErr := userFound.Decode(&user); decodeErr != nil{
-		return user, decodeErr
+	c := data.Client().DB("doprtest").C("users")
+	err := c.Find(bson.M{"username": username, "password": password}).One(&user)
+	if err != nil{
+		return user, err
 	}
 	return user, nil
 }
 
-func RegisterUser(username, password, email string) (bool, error){
-
+func RegisterUser(username, password, email string) (User, error){
+	var userResp User
 	_, userErr := userExists(username, password, email)
 	if userErr == nil{
-		return false, errors.New("User already exists")
+		return userResp, errors.New("User already exists")
 	}
-
-	inserted, insertErr := data.Client.Database("doprtest").Collection("users").InsertOne(context.TODO(), bson.M{"username":username, "password":password, "email":email})
-	fmt.Print(inserted)
+	c := data.Client().DB("doprtest").C("users")
+	insertErr := c.Insert(User{Username:username, Password:password, Email:email})
 	if insertErr != nil{
-		return false, insertErr
+		return userResp, insertErr
 	}
-	return true, nil
+	return userResp, nil
 }
 
 func userExists(username, password, email string) (User, error){
 	var user User
-	userFound := data.Client.Database("doprtest").Collection("users").FindOne(context.TODO(), bson.M{"username": username, "password": password, "email": email})
-	if decodeErr := userFound.Decode(&user); decodeErr != nil{
-		return user, decodeErr
+	c := data.Client().DB("doprtest").C("users")
+	err := c.Find(bson.M{"username": username, "password": password, "email": email}).One(&user)
+	if err != nil{
+		return user, err
 	}
-	return user,  nil
+	return user, nil
 }
 /*
 * @use validate user by toke

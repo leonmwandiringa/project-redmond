@@ -94,6 +94,18 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name:  "login",
+			Usage: "authenticates to dopr remote server",
+			Flags: []cli.Flag{
+				cli.BoolFlag{Name: "username, u"},
+				cli.BoolFlag{Name: "password, p"},
+			},
+			Action: func(c *cli.Context) error {
+					fmt.Print(c.FlagNames()[0])
+					return nil
+			},
+		},
 	}
 	app.OnUsageError = func(c *cli.Context, err error, isSubcommand bool) error {
 		if isSubcommand {
