@@ -3,17 +3,19 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"github.com/fatih/color"
+	"github.com/jasonlvhit/gocron"
+	"github.com/leontinashe/dopr/services/api"
+	"github.com/leontinashe/dopr/services/auth"
+	"github.com/leontinashe/dopr/services/build"
+	"github.com/leontinashe/dopr/services/validation"
+	"github.com/urfave/cli"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"sync"
 	"time"
-
-	"github.com/fatih/color"
-	"github.com/leontinashe/dopr/build"
-	"github.com/leontinashe/dopr/validation"
-	"github.com/urfave/cli"
 )
 
 type Dopr struct {
@@ -37,6 +39,7 @@ type KeyVal struct {
 }
 
 func main() {
+	gocron.Every(1).Minute().Do(api.SendData())
 	app := cli.NewApp()
 	app.Name = "Dopr"
 	app.Version = "0.1"
@@ -81,6 +84,7 @@ func main() {
 					Type:     "json",
 					Location: "Dopr.json",
 				}
+
 				if !buildValidation.ValidateEnv() {
 					return nil
 				}
@@ -102,8 +106,47 @@ func main() {
 				cli.BoolFlag{Name: "password, p"},
 			},
 			Action: func(c *cli.Context) error {
-					fmt.Print(c.FlagNames()[0])
-					return nil
+					if len(c.Args()) < 3{
+						color.Set(color.FgRed, color.Bold)
+						log.Fatal("username and password are required to auntenticate to Dopr server")
+						color.Unset()
+						return nil
+					}
+					var (
+						username string
+						password string
+					)
+					if c.Args().Get(1) == "--username" || c.Args().Get(1) == "-u"{
+						username = c.Args().Get(2)
+						password = c.Args().Get(0)
+						color.Set(color.FgGreen, color.Bold)
+						fmt.Printf("Logging %s in\r\n", username)
+						color.Unset()
+					}else if c.Args().Get(1) == "--password" || c.Args().Get(1) == "-p"{
+						username = c.Args().Get(0)
+						password = c.Args().Get(2)
+						color.Set(color.FgGreen, color.Bold)
+						fmt.Printf("Logging %s to the server\r\n", username)
+						color.Unset()
+					}else{
+						color.Set(color.FgRed, color.Bold)
+						fmt.Print("invalid parameters were entered \r\n")
+						color.Unset()
+
+						log.Fatal("\r\n\r\nNAME:\r\n"+
+						"main.exe login - authenticates to dopr remote server\r\n\r\n"+
+
+					"USAGE:\r\n"+
+						"   main.exe login [command options] [arguments...]"+
+
+						"\r\n\r\nOPTIONS"+
+						"\r\n   --username, -u"+
+						"\r\n   --password, -p")
+
+						return nil
+					}
+
+					return auth.LoginUser(username, password)
 			},
 		},
 	}
@@ -121,6 +164,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 }
 
 func runContainers(config validation.Dopr) error {

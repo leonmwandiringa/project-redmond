@@ -17,5 +17,6 @@ func main(){
 
 	r.POST("/register", handlers.HandleRegister)
 	r.POST("/login", handlers.HandleLogin)
+	r.POST("/metrics", handlers.IngestData)
 	r.Run(":5000")
 }
