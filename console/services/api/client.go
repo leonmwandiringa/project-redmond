@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func SendData(){
+func SendData() error{
 	serverUrl := "http://localhost:5000/metrics"
 	payload := make(map[string]interface{})
 
@@ -14,7 +14,7 @@ func SendData(){
 	requestPayload, _ := json.Marshal(payload)
 	_, err := http.Post(serverUrl,"application/json", bytes.NewBuffer(requestPayload))
 	if err != nil{
-		return
+		return nil
 	}
-	return
+	return nil
 }
