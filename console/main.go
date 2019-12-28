@@ -39,7 +39,6 @@ type KeyVal struct {
 }
 
 func main() {
-	gocron.Every(1).Minute().Do(api.SendData())
 	app := cli.NewApp()
 	app.Name = "Dopr"
 	app.Version = "0.1"
@@ -164,6 +163,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	s := gocron.NewScheduler()
+	s.Every(30).Seconds().Do(api.SendData)
+	<- s.Start()
 
 }
 
