@@ -3,7 +3,7 @@ package services
 import (
 	"errors"
 	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/leontinashe/doprserver/data"
+	"github.com/dopr/apigateway/data"
 	"gopkg.in/mgo.v2/bson"
 	"time"
 )

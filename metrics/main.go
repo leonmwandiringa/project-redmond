@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/leontinashe/doprserver/handlers"
+	"github.com/dopr/metrics/handlers"
 )
 
 func init(){
@@ -15,8 +15,6 @@ func main(){
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
-	r.POST("/register", handlers.HandleRegister)
-	r.POST("/login", handlers.HandleLogin)
 	r.POST("/metrics", handlers.IngestData)
-	r.Run(":5000")
+	r.Run(":5001")
 }

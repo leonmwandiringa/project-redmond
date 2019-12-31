@@ -1,4 +1,4 @@
-module github.com/leontinashe/doprserver
+module github.com/dopr/apigateway
 
 go 1.12
 

@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/leontinashe/doprserver/services"
+	"github.com/dopr/apigateway/services"
 	"net/http"
 )
 

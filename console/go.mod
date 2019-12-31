@@ -1,4 +1,4 @@
-module github.com/leontinashe/dopr
+module github.com/dopr/console
 
 go 1.13
 
