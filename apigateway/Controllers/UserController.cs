@@ -8,7 +8,7 @@ using api_gateway.Entities.Models;
 using api_gateway.Services;
 using Microsoft.AspNetCore.Cors;
 
-namespace Limitless_api_gateway.Controllers
+namespace api_gateway.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

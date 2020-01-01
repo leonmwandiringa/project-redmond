@@ -17,20 +17,18 @@ namespace api_gateway.Controllers
     public class AuthController : ControllerBase
     {
         private readonly AuthService _authService;
-        private readonly CompanyService _companyService;
 
-        public AuthController(AuthService authService, CompanyService companyService)
+        public AuthController(AuthService authService)
         {
             _authService = authService;
-            _companyService = companyService;
         }
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public ActionResult<User> Register([FromBody]Usercompany userCompany)
+        public ActionResult<User> Register([FromBody]User user)
         {
 
-            if (string.IsNullOrEmpty(userCompany.email) || string.IsNullOrEmpty(userCompany.password) || string.IsNullOrEmpty(userCompany.companyname))
+            if (string.IsNullOrEmpty(user.email) || string.IsNullOrEmpty(user.password) || string.IsNullOrEmpty(user.companyname))
             {
                 return BadRequest(new
                 {
@@ -40,13 +38,13 @@ namespace api_gateway.Controllers
                 });
             }
             
-            var _userRegResponse = _authService.RegisterUser(userCompany);
+            var _userRegResponse = _authService.RegisterUser(user);
 
             if (_userRegResponse == null ) {
                 return StatusCode(403, new
                 {
                     status = false,
-                    message = "User or company with the same email address is already registered. Try using another email account",
+                    message = "User with the same email address is already registered. Try using another email account",
                     data = false
                 });
                 

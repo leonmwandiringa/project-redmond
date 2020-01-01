@@ -35,12 +35,6 @@ namespace api_gateway.Entities.Models
         [BsonElement("active")]
         public bool active { get; set; } = true;
 
-        [BsonElement("role")]
-        public string role { get; set; }
-
-        [BsonElement("lastsignedin")]
-        public string lastsignedin { get; set; }
-
     }
 }
 

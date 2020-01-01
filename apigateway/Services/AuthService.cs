@@ -11,29 +11,27 @@ namespace api_gateway.Services
     {
         private readonly IMongoCollection<User> _user;
         private readonly JwtService _jwtService;
-        private readonly CompanyService _company;
-        public AuthService(IOptions<Settings> options, JwtService jwtService, CompanyService company)
+        public AuthService(IOptions<Settings> options, JwtService jwtService)
         {
             var _db = new MongoClient(options.Value.ConnectionString)
                         .GetDatabase(options.Value.Database);
 
             _user = _db.GetCollection<User>("users");
             _jwtService = jwtService;
-            _company = company;
         }
 
-        public User RegisterUser(Company userCompany)
+        public User RegisterUser(User user)
         {
             //find user first
-            var userFound = _user.Find<User>(fuser => fuser.email == userCompany.email).FirstOrDefault();
+            var userFound = _user.Find<User>(fuser => fuser.email == user.email).FirstOrDefault();
             if (userFound != null)
             {
                 return null;
             };
 
-            userCompany.name = "Admin";
-            userCompany.position = "Admin";
-            userCompany.role = "ADMIN";
+            user.name = "Admin";
+            user.position = "Admin";
+            user.role = "ADMIN";
             var company = new Company
             {
                 email = userCompany.email,
