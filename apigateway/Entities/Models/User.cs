@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -25,9 +24,6 @@ namespace api_gateway.Entities.Models
 
         [BsonElement("surname")]
         public string surname { get; set; }
-
-        [BsonElement("position")]
-        public string position { get; set; }
 
         [BsonElement("password")]
         public string password { get; set; }

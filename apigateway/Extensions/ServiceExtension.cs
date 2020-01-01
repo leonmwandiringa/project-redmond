@@ -1,8 +1,6 @@
-using FluentValidation;
-using FootLocker.DAL;
-using FootLocker.DAL.Repositories;
-using FootLocker.Helpers;
-using FootLocker.Services;
+using api_gateway.Entities.Models;
+using api_gateway.Helpers;
+using api_gateway.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using OwaspHeaders.Core.Extensions;
@@ -39,20 +37,13 @@ namespace api_gateway.Extensions
             });
         }
 
-        public static void ConfigureRepositories(this IServiceCollection services)
-        {
-            services.AddScoped<RepositoryContext>();
-            services.AddScoped<XGPCodeRepository>();
-            services.AddScoped<RedeemedCodeRepository>();
-            services.AddScoped<JacketCodeRepository>();
-            services.AddScoped<GamescomCodeRepository>();
-            services.AddScoped<CardCodeRepository>();
-        }
-
         public static void ConfigureServices(this IServiceCollection services)
         {
-            services.AddScoped<CodesSeederService>();
-            services.AddScoped<CampaignService>();
+            services.AddScoped<>(AuthService);
+            services.AddScoped<>(CryptoService);
+            services.AddScoped<>(JwtService);
+            services.AddScoped<>(UserService);
+
         }
 
         public static SecureHeadersMiddlewareConfiguration BuildDefaultConfiguration()

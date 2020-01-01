@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Diagnostics;
+using api_gateway.Extensions;
 
 namespace api_gateway
 {
@@ -49,14 +50,9 @@ namespace api_gateway
 
 
             //add swagger 
-            services.AddSwaggerGen(c => {
-                c.SwaggerDoc("v1", new Info
-                {
-                    Version = "V1",
-                    Title = "Dopr Gateway api",
-                    Description = "Auth and Gateway api"
-                });
-            });
+            services.ConfigureSwagger();
+            services.ConfigureCors();
+            services.ConfigureServices();
 
             //gateway auth key
             var GatewayAuthKey = "fgHGHGFHh47g344ryft6HGFH789khgfheriHH9384fkdfGFHFtkvjjhkgfSRHGFHGqw56yEFH";

@@ -28,7 +28,7 @@ namespace api_gateway.Controllers
         public ActionResult<User> Register([FromBody]User user)
         {
 
-            if (string.IsNullOrEmpty(user.email) || string.IsNullOrEmpty(user.password) || string.IsNullOrEmpty(user.companyname))
+            if (string.IsNullOrEmpty(user.email) || string.IsNullOrEmpty(user.password))
             {
                 return BadRequest(new
                 {

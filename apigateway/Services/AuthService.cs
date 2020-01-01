@@ -29,29 +29,13 @@ namespace api_gateway.Services
                 return null;
             };
 
-            user.name = "Admin";
-            user.position = "Admin";
-            user.role = "ADMIN";
-            var company = new Company
-            {
-                email = userCompany.email,
-                companyname = userCompany.companyname,
-
-            };
-            var companyCreated = _company.CreateCompany(company);
-
-            if (companyCreated == null)
-            {
-                return null;
-            }
-
             var user = new User
             {
-                email = userCompany.email,
-                password = CryptoService.HashPassword(userCompany.password),
-                role = userCompany.role,
-                organization = companyCreated.id,
-                position = userCompany.position
+                email = user.email,
+                password = CryptoService.HashPassword(user.password),
+                username = user.password,
+                organization = "",
+                position = "",
             };
             //insert user and return resp
             _user.InsertOne(user);

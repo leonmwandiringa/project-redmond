@@ -10,14 +10,12 @@ namespace api_gateway.Services
     public class UserService
     {
         private readonly IMongoCollection<User> _user;
-        private readonly CompanyService _company;
-        public UserService(IOptions<Settings> options, JwtService jwtService, CompanyService company)
+        public UserService(IOptions<Settings> options, JwtService jwtService)
         {
             var _db = new MongoClient(options.Value.ConnectionString)
                         .GetDatabase(options.Value.Database);
 
             _user = _db.GetCollection<User>("users");
-            _company = company;
         }
 
         public List<User> GetUsers()
