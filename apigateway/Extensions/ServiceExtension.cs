@@ -39,11 +39,7 @@ namespace api_gateway.Extensions
 
         public static void ConfigureServices(this IServiceCollection services)
         {
-            services.AddScoped<>(AuthService);
-            services.AddScoped<>(CryptoService);
-            services.AddScoped<>(JwtService);
-            services.AddScoped<>(UserService);
-
+            services.AddScoped<JwtService>();
         }
 
         public static SecureHeadersMiddlewareConfiguration BuildDefaultConfiguration()

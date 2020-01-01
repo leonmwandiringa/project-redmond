@@ -29,18 +29,17 @@ namespace api_gateway.Services
                 return null;
             };
 
-            var user = new User
+            var newUser = new User
             {
                 email = user.email,
                 password = CryptoService.HashPassword(user.password),
                 username = user.password,
                 organization = "",
-                position = "",
             };
             //insert user and return resp
-            _user.InsertOne(user);
-            user.password = null;
-            return user;
+            _user.InsertOne(newUser);
+            newUser.password = null;
+            return newUser;
         }
 
         public object LoginUser(string email, string password)

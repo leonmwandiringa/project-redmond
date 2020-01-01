@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Diagnostics;
 using api_gateway.Extensions;
+using api_gateway.Helpers;
 
 namespace api_gateway
 {
@@ -36,7 +37,8 @@ namespace api_gateway
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            //MvcOptions.EnableEndpointRouting = false;
+            services.AddMvc(option => option.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             //assign values to settings class
             services.Configure<Settings>(options =>
