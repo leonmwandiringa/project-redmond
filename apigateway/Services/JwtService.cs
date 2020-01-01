@@ -22,11 +22,12 @@ namespace api_gateway.Services
         public string Authenticate(string id, string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
+            Console.WriteLine(_settings.Value.SecretKey);
             //get key
             var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_settings.Value.SecretKey));
             //set claims
             var claims = new []{
-                    new Claim(JwtRegisteredClaimNames.Jti, id.ToString()),
+                    new Claim(JwtRegisteredClaimNames.Jti, id),
                     new Claim(JwtRegisteredClaimNames.Email, email)
                 };
             //generate token

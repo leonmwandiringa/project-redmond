@@ -33,8 +33,10 @@ namespace api_gateway.Services
             {
                 email = user.email,
                 password = CryptoService.HashPassword(user.password),
-                username = user.password,
-                organization = "",
+                username = user.username,
+                name = null,
+                surname = null,
+                organization = null,
             };
             //insert user and return resp
             _user.InsertOne(newUser);
@@ -68,13 +70,13 @@ namespace api_gateway.Services
                     data = false
                 };
             }
-
+            
             //created successfull respponse
             var token = new
             {
                 status = true,
                 message = "User successfully authenticated",
-                token = _jwtService.Authenticate(userFound.id, userFound.email),
+                token = _jwtService.Authenticate(Convert.ToString(userFound.id), userFound.email),
                 data = userFound
             };
 

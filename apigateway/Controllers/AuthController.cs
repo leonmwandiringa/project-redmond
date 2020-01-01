@@ -11,8 +11,8 @@ using api_gateway.Helpers;
 
 namespace api_gateway.Controllers
 {
-    [Route("api/[controller]")]
-    [EnableCors]
+    [Route("api/v1/[controller]")]
+    //[EnableCors]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -28,7 +28,7 @@ namespace api_gateway.Controllers
         public ActionResult<User> Register([FromBody]User user)
         {
 
-            if (string.IsNullOrEmpty(user.email) || string.IsNullOrEmpty(user.password))
+            if (string.IsNullOrEmpty(user.email) || string.IsNullOrEmpty(user.password) || string.IsNullOrEmpty(user.username))
             {
                 return BadRequest(new
                 {

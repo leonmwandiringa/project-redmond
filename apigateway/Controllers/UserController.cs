@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Cors;
 
 namespace api_gateway.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
-    [EnableCors]
+    //[EnableCors]
     public class UserController : ControllerBase
     {
         private readonly UserService _user;

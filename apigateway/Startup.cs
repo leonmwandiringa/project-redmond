@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Diagnostics;
 using api_gateway.Extensions;
+using OwaspHeaders.Core.Extensions;
 using api_gateway.Helpers;
 
 namespace api_gateway
@@ -45,15 +46,15 @@ namespace api_gateway
             {
                 options.ConnectionString = Configuration.GetSection("Mongodb:ConnectionString").Value;
                 options.Database = Configuration.GetSection("Mongodb:Database").Value;
-                options.SecretKey = Configuration.GetSection("JWT:SecretKey").Value;
-                options.Issuer = Configuration.GetSection("JWT:Issuer").Value;
-                options.ExpiresInMinutes = Convert.ToInt16(Configuration.GetSection("JWT:ExpiresInMinutes").Value);
+                options.SecretKey = Configuration.GetSection("Authentication:SecretKey").Value;
+                options.Issuer = Configuration.GetSection("Authentication:Issuer").Value;
+                options.ExpiresInMinutes = Convert.ToInt16(Configuration.GetSection("Authentication:ExpiresInMinutes").Value);
             });
 
 
             //add swagger 
-            services.ConfigureSwagger();
-            services.ConfigureCors();
+            //services.ConfigureSwagger();
+            //services.ConfigureCors();
             services.ConfigureServices();
 
             //gateway auth key
@@ -97,7 +98,7 @@ namespace api_gateway
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -106,7 +107,7 @@ namespace api_gateway
             else
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+               // app.UseHsts();
             }
 
             //exception handling for 401 and 500
@@ -147,15 +148,22 @@ namespace api_gateway
             });
 
             //add swagger middleware and ui
-            app.UseSwagger();
+            /*app.UseSwagger();
             app.UseSwaggerUI(c => {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Dopr Api V1");
-            });
+            });*/
+
+            app.UseSecureHeadersMiddleware(ServiceExtensions.BuildDefaultConfiguration());
 
             app.UseAuthentication();
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
+            
             app.UseMvc();
+
+            //app.UseCors();
+
+            await app.UseOcelot();
         }
     }
 }
