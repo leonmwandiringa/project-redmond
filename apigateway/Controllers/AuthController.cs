@@ -12,7 +12,7 @@ using api_gateway.Helpers;
 namespace api_gateway.Controllers
 {
     [Route("api/v1/[controller]")]
-    //[EnableCors]
+    [EnableCors]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -52,13 +52,14 @@ namespace api_gateway.Controllers
             return Ok(new
             {
                 status = true,
-                message = "User was successfully created",
+                message = "User was successfully created, You can now log in with your account",
                 data = _userRegResponse
             });
 
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public ActionResult<User> Login([FromBody]User User)
         {
             if (string.IsNullOrEmpty(User.email) || string.IsNullOrEmpty(User.password))
@@ -72,7 +73,16 @@ namespace api_gateway.Controllers
             }
             //get authentication response from service
             var _userCredsCorrect = _authService.LoginUser(User.email, User.password);
-            return Ok(_userCredsCorrect);
+            if(_userCredsCorrect == null){
+                return StatusCode(403, new
+                {
+                    status = false,
+                    message = "username and password combination are incorrect",
+                    data = false
+                });
+            }
+            
+            return StatusCode(200, _userCredsCorrect);
 
         }
     }

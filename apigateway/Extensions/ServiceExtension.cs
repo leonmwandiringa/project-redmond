@@ -17,11 +17,13 @@ namespace api_gateway.Extensions
         {
             services.AddCors(options =>
             {
-                options.AddPolicy("CorsPolicy",
-                  builder => builder.AllowAnyOrigin()
-                  .AllowAnyMethod()
-                  .AllowAnyHeader()
-                  .AllowCredentials());
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
             });
         }
 

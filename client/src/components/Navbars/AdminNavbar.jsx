@@ -21,17 +21,29 @@ import {
 } from "reactstrap";
 
 class AdminNavbar extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {
       collapseOpen: false,
-      color: "navbar-transparent"
+      color: "navbar-transparent",
+      user: null,
+      token: null
     };
   }
   componentDidMount() {
     window.addEventListener("resize", this.updateColor);
   }
-  componentWillUnmount() {
+  async componentWillMount(){
+    if(!sessionStorage.getItem("DOPR_USER") || !sessionStorage.getItem("DOPR_TOKEN")){
+      this.props.history.push("/auth/login")
+    }
+    var userObj = await JSON.parse(sessionStorage.getItem("DOPR_USER"))
+    this.setState({user: userObj})
+    this.setState({token: sessionStorage.getItem("DOPR_TOKEN")})
+    console.log(this.state.user.username)
+  }
+  async componentWillUnmount() {
     window.removeEventListener("resize", this.updateColor);
   }
   // function that adds color white/transparent to the navbar on resize (this is for the collapse)
@@ -61,6 +73,10 @@ class AdminNavbar extends React.Component {
       collapseOpen: !this.state.collapseOpen
     });
   };
+  logOutUser(){
+    sessionStorage.clear()
+    return this.props.history.push("/auth/login")
+  }
   render() {
     return (
       <>
@@ -111,47 +127,20 @@ class AdminNavbar extends React.Component {
                     color="default"
                     data-toggle="dropdown"
                     nav
-                  >
-                    <div className="notification d-none d-lg-block d-xl-block" />
-                    <i className="tim-icons icon-sound-wave" />
-                    <p className="d-lg-none">Notifications</p>
-                  </DropdownToggle>
-                  <DropdownMenu className="dropdown-navbar" right tag="ul">
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">
-                        Mike John responded to your email
-                      </DropdownItem>
-                    </NavLink>
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">
-                        You have 5 more tasks
-                      </DropdownItem>
-                    </NavLink>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-                <UncontrolledDropdown nav>
-                  <DropdownToggle
-                    caret
-                    color="default"
-                    data-toggle="dropdown"
-                    nav
                     onClick={e => e.preventDefault()}
                   >
                     <div className="photo">
                       <img alt="..." src={require("assets/img/anime3.png")} />
                     </div>
                     <b className="caret d-none d-lg-block d-xl-block" />
-                    <p className="d-lg-none">Log out</p>
+                  <p className="d-lg-none">{this.state.user ? this.state.user.username : ""}</p>
                   </DropdownToggle>
                   <DropdownMenu className="dropdown-navbar" right tag="ul">
-                    <NavLink tag="li" to="">
-                      <DropdownItem className="nav-item">Profile</DropdownItem>
-                    </NavLink>
                     <NavLink tag="li">
                       <DropdownItem className="nav-item">Settings</DropdownItem>
                     </NavLink>
                     <DropdownItem divider tag="li" />
-                    <NavLink tag="li">
+                    <NavLink tag="li" onClick={()=>{this.logOutUser()}}>
                       <DropdownItem className="nav-item">Log out</DropdownItem>
                     </NavLink>
                   </DropdownMenu>

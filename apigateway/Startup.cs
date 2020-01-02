@@ -54,7 +54,7 @@ namespace api_gateway
 
             //add swagger 
             //services.ConfigureSwagger();
-            //services.ConfigureCors();
+            services.ConfigureCors();
             services.ConfigureServices();
 
             //gateway auth key
@@ -161,7 +161,7 @@ namespace api_gateway
             
             app.UseMvc();
 
-            //app.UseCors();
+            app.UseCors();
 
             await app.UseOcelot();
         }

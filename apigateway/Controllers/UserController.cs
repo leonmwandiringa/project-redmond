@@ -13,7 +13,7 @@ namespace api_gateway.Controllers
     [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
-    //[EnableCors]
+    [EnableCors]
     public class UserController : ControllerBase
     {
         private readonly UserService _user;

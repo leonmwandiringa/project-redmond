@@ -9,28 +9,32 @@ var routes = [
     name: "Dashboard",
     icon: "tim-icons icon-chart-pie-36",
     component: Dashboard,
-    layout: "/admin"
+    layout: "/admin",
+    sidebar: true
   },
   {
     path: "/user-profile",
     name: "User Profile",
     icon: "tim-icons icon-single-02",
     component: UserProfile,
-    layout: "/admin"
+    layout: "/admin",
+    sidebar: false
   },
   {
     path: "/login",
-    name: "Auth",
+    name: "Login",
     icon: "tim-icons icon-single-02",
     component: Login,
-    layout: "/auth"
+    layout: "/auth",
+    sidebar: false
   },
   {
     path: "/register",
-    name: "Auth",
+    name: "Register",
     icon: "tim-icons icon-single-02",
     component: Register,
-    layout: "/auth"
+    layout: "/auth",
+    sidebar: false
   }
 ];
 export default routes;

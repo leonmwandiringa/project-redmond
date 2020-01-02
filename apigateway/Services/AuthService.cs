@@ -49,26 +49,14 @@ namespace api_gateway.Services
             var userFound = _user.Find(user => user.email == email).FirstOrDefault();
             if (userFound == null)
             {
-                return new
-                {
-                    status = false,
-                    message = "an error occured find the user",
-                    token = false,
-                    data = false
-                };
+                return null;
             }
 
             //verify user password
             var passwordValid = CryptoService.VerifyHashedPassword(userFound.password, password);
             if (!passwordValid)
             {
-                return new
-                {
-                    status = false,
-                    message = "it seems like you have entered invalid password",
-                    token = false,
-                    data = false
-                };
+                return null;
             }
             
             //created successfull respponse
