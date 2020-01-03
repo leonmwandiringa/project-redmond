@@ -1,5 +1,5 @@
 import React from "react";
-
+import {CONSTANTS} from "../env";
 // reactstrap components
 import {
   Button,
@@ -7,21 +7,79 @@ import {
   CardHeader,
   CardBody,
   CardFooter,
-  CardText,
   FormGroup,
   Form,
   Input,
   Row,
-  Col
+  Col,
+  Nav,
+  Alert
 } from "reactstrap";
+import * as axios from "axios";
 
 class UserProfile extends React.Component {
+
+  state = {
+    email: null,
+    username: null,
+    name: null,
+    surname: null,
+    organization: null,
+    notification: {
+      status: null,
+      message: null
+    },
+    user: null,
+    loading: false
+
+  }
+
+  async UpdateUser(){
+      if(!this.state.email || !this.state.password){
+          return false
+      }
+      this.setState({notification:{status: null, message: null}, loading: true})
+      await this.submitUpdate()
+  }
+
+
+  async submitUpdate(){
+
+    var userObj = await JSON.parse(sessionStorage.getItem("DOPR_USER"));
+    this.setState({user: userObj});
+    try {
+        var data = this.state;
+        delete data.notification
+        delete data.loading
+        delete data.user
+        
+        let response = await axios.put(`${CONSTANTS.baseUrl}/api/v1/User/${this.state.user.id}`, data);
+        this.setState({notification:{status: "success", message: response.data.message}});
+
+    } catch(error){
+      this.setState({notification:{status: "danger", message: error.response.data.message}});
+    }
+
+    this.setState({loading: false})
+  }
+
+  renderNotifications(){
+    if(this.state.notification.status){
+      return (<Alert color={this.state.notification.status}>{this.state.notification.message}</Alert>)
+    }
+    return null
+  }
+
+  activeRoute(routeName) {
+    return this.props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
+  }
+
   render() {
     return (
       <>
         <div className="content">
           <Row>
-            <Col md="8">
+            <Col md="10" lg="10" sm="10">
               <Card>
                 <CardHeader>
                   <h5 className="title">Edit Profile</h5>
@@ -29,109 +87,84 @@ class UserProfile extends React.Component {
                 <CardBody>
                   <Form>
                     <Row>
-                      <Col className="pr-md-1" md="5">
+                      <Col className="pr-md-1" md="4" lg="4">
                         <FormGroup>
-                          <label>Company (disabled)</label>
+                          <label>Name</label>
                           <Input
-                            defaultValue="Creative Code Inc."
-                            disabled
-                            placeholder="Company"
+                            defaultValue={this.state.name}
+                            placeholder="Name"
                             type="text"
+                            onChange={(e)=>{
+                              this.setState({name: e.target.value})
+                            }}
                           />
                         </FormGroup>
                       </Col>
-                      <Col className="px-md-1" md="3">
+                      <Col className="px-md-1" md="4" lg="4">
                         <FormGroup>
-                          <label>Username</label>
+                          <label>Surname</label>
                           <Input
-                            defaultValue="michael23"
-                            placeholder="Username"
+                            defaultValue={this.state.surname}
+                            placeholder="Surname"
                             type="text"
+                            onChange={(e)=>{
+                              this.setState({name: e.target.value})
+                            }}
                           />
                         </FormGroup>
                       </Col>
-                      <Col className="pl-md-1" md="4">
+                      <Col className="pl-md-1" md="4" lg="4">
+                        <FormGroup>
+                          <label>Organization</label>
+                          <Input
+                            defaultValue=""
+                            placeholder="Organization"
+                            type="text"
+                            onChange={(e)=>{
+                              this.setState({name: e.target.value})
+                            }}
+                            defaultValue={this.state.organization}
+                          />
+                        </FormGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col className="pr-md-1" md="4" lg="4">
                         <FormGroup>
                           <label htmlFor="exampleInputEmail1">
                             Email address
                           </label>
-                          <Input placeholder="mike@email.com" type="email" />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col className="pr-md-1" md="6">
-                        <FormGroup>
-                          <label>First Name</label>
-                          <Input
-                            defaultValue="Mike"
-                            placeholder="Company"
-                            type="text"
+                          <Input placeholder="mike@email.com" type="email" onChange={(e)=>{
+                              this.setState({name: e.target.value})
+                            }}
+                            defaultValue={this.state.email}
                           />
                         </FormGroup>
                       </Col>
-                      <Col className="pl-md-1" md="6">
+                      <Col className="px-md-1" md="4" lg="4">
                         <FormGroup>
-                          <label>Last Name</label>
+                          <label>Username</label>
                           <Input
-                            defaultValue="Andrew"
-                            placeholder="Last Name"
+                            defaultValue={this.state.username}
+                            placeholder="Username"
                             type="text"
+                            disabled
+                            onChange={(e)=>{
+                              this.setState({password: e.target.value})
+                            }}
                           />
                         </FormGroup>
                       </Col>
-                    </Row>
-                    <Row>
-                      <Col md="12">
+                      <Col className="pl-md-1" md="4" lg="4">
                         <FormGroup>
-                          <label>Address</label>
+                          <label>Password</label>
                           <Input
-                            defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                            placeholder="Home Address"
+                            defaultValue={this.state.password}
+                            placeholder="Password"
                             type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col className="pr-md-1" md="4">
-                        <FormGroup>
-                          <label>City</label>
-                          <Input
-                            defaultValue="Mike"
-                            placeholder="City"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="px-md-1" md="4">
-                        <FormGroup>
-                          <label>Country</label>
-                          <Input
-                            defaultValue="Andrew"
-                            placeholder="Country"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="pl-md-1" md="4">
-                        <FormGroup>
-                          <label>Postal Code</label>
-                          <Input placeholder="ZIP Code" type="number" />
-                        </FormGroup>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col md="8">
-                        <FormGroup>
-                          <label>About Me</label>
-                          <Input
-                            cols="80"
-                            defaultValue="Lamborghini Mercy, Your chick she so thirsty, I'm in
-                            that two seat Lambo."
-                            placeholder="Here can be your description"
-                            rows="4"
-                            type="textarea"
+                            onChange={(e)=>{
+                              this.setState({pasword: e.target.value})
+                            }}
                           />
                         </FormGroup>
                       </Col>
@@ -139,50 +172,29 @@ class UserProfile extends React.Component {
                   </Form>
                 </CardBody>
                 <CardFooter>
-                  <Button className="btn-fill" color="primary" type="submit">
+                  <Button className="btn-fill" color="primary" type="submit" disabled={this.state.loading}>
                     Save
                   </Button>
                 </CardFooter>
               </Card>
             </Col>
-            <Col md="4">
+            <Col md="2" sm="2" lg="2">
               <Card className="card-user">
                 <CardBody>
-                  <CardText />
-                  <div className="author">
-                    <div className="block block-one" />
-                    <div className="block block-two" />
-                    <div className="block block-three" />
-                    <div className="block block-four" />
-                    <a href="#pablo" onClick={e => e.preventDefault()}>
-                      <img
-                        alt="..."
-                        className="avatar"
-                        src={require("assets/img/emilyz.jpg")}
-                      />
-                      <h5 className="title">Mike Andrew</h5>
-                    </a>
-                    <p className="description">Ceo/Co-Founder</p>
-                  </div>
-                  <div className="card-description">
-                    Do not be scared of the truth because we need to restart the
-                    human foundation in truth And I love you like Kanye loves
-                    Kanye I love Rick Owens’ bed design but the back is...
-                  </div>
+                  <Nav>
+                    <li
+                      className={this.activeRoute("/profile")}
+                        key="1"
+                      >
+                      <a href="/admin/profile"
+                        className="nav-link"
+                        activeClassName="active"
+                      >
+                        <i className="tim-icons icon-single-02" />
+                      </a>
+                    </li>
+                  </Nav>
                 </CardBody>
-                <CardFooter>
-                  <div className="button-container">
-                    <Button className="btn-icon btn-round" color="facebook">
-                      <i className="fab fa-facebook" />
-                    </Button>
-                    <Button className="btn-icon btn-round" color="twitter">
-                      <i className="fab fa-twitter" />
-                    </Button>
-                    <Button className="btn-icon btn-round" color="google">
-                      <i className="fab fa-google-plus" />
-                    </Button>
-                  </div>
-                </CardFooter>
               </Card>
             </Col>
           </Row>

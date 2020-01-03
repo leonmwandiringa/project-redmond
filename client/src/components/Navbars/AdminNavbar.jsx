@@ -4,20 +4,16 @@ import classNames from "classnames";
 
 // reactstrap components
 import {
-  Button,
   Collapse,
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
   UncontrolledDropdown,
-  Input,
-  InputGroup,
   NavbarBrand,
   Navbar,
   NavLink,
   Nav,
-  Container,
-  Modal
+  Container
 } from "reactstrap";
 
 class AdminNavbar extends React.Component {
@@ -36,12 +32,11 @@ class AdminNavbar extends React.Component {
   }
   async componentWillMount(){
     if(!sessionStorage.getItem("DOPR_USER") || !sessionStorage.getItem("DOPR_TOKEN")){
-      this.props.history.push("/auth/login")
+      return this.props.history.push("/auth/login")
     }
     var userObj = await JSON.parse(sessionStorage.getItem("DOPR_USER"))
     this.setState({user: userObj})
     this.setState({token: sessionStorage.getItem("DOPR_TOKEN")})
-    console.log(this.state.user.username)
   }
   async componentWillUnmount() {
     window.removeEventListener("resize", this.updateColor);
@@ -136,8 +131,8 @@ class AdminNavbar extends React.Component {
                   <p className="d-lg-none">{this.state.user ? this.state.user.username : ""}</p>
                   </DropdownToggle>
                   <DropdownMenu className="dropdown-navbar" right tag="ul">
-                    <NavLink tag="li">
-                      <DropdownItem className="nav-item">Settings</DropdownItem>
+                    <NavLink tag="li" >
+                      <a href="/admin/settings"><DropdownItem className="nav-item">Settings</DropdownItem></a>
                     </NavLink>
                     <DropdownItem divider tag="li" />
                     <NavLink tag="li" onClick={()=>{this.logOutUser()}}>

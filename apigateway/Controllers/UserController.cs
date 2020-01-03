@@ -33,6 +33,22 @@ namespace api_gateway.Controllers
             return _user.GetUser(id);
         }
 
+        [HttpPut("{id}")]
+        public ActionResult<object> UpdateUser(string id, [FromBody]User user)
+        {
+            if (string.IsNullOrEmpty(user.password))
+            {
+                return StatusCode(403, new
+                {
+                    status = false,
+                    message = "password  required",
+                    data = false
+                });
+            }
+            
+            return _user.GetUser(id);
+        }
+
         [HttpPost("{orgid}")]
         public ActionResult<object> CreateUser([FromBody]User user)
         {

@@ -77,6 +77,27 @@ namespace api_gateway.Services
             }
         }
 
+        public object UpdateUser(User user)
+        {
+            var userFound = _user.Find(u => u.email == user.email).FirstOrDefault();
+            if (userFound == null)
+            {
+                return null;
+            }
+
+            //created successfull respponse
+            var token = new
+            {
+                status = true,
+                message = "User successfully authenticated",
+                token = _jwtService.Authenticate(Convert.ToString(userFound.id), userFound.email),
+                data = userFound
+            };
+
+            return token;
+
+        }
+
     }
 }
 

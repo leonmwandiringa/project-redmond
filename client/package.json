@@ -1,5 +1,5 @@
 {
-  "name": "dipr",
+  "name": "dopr",
   "version": "0.1.0",
   "dependencies": {
     "@types/react": "16.4.16",

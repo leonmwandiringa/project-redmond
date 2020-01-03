@@ -13,7 +13,7 @@ var routes = [
     sidebar: true
   },
   {
-    path: "/user-profile",
+    path: "/profile",
     name: "User Profile",
     icon: "tim-icons icon-single-02",
     component: UserProfile,
