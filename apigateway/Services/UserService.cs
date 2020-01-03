@@ -4,6 +4,8 @@ using MongoDB.Driver;
 using api_gateway.Helpers;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
 
 namespace api_gateway.Services
 {
@@ -25,18 +27,7 @@ namespace api_gateway.Services
 
         public object GetUser(string id)
         {
-            try
-            {
-                return _user.Find<User>(user => user.id == id).FirstOrDefault();    
-            }
-            catch (Exception err)
-            {
-                return new
-                {
-                    message = "Sorry an error occured, its either user was not found or database error",
-                    error = err.Message
-                };
-            }
+            return _user.Find<User>(user => user.id == id).FirstOrDefault();    
 
         }
 
@@ -77,24 +68,24 @@ namespace api_gateway.Services
             }
         }
 
-        public object UpdateUser(User user)
+        public User UpdateUser(User user, string id)
         {
-            var userFound = _user.Find(u => u.email == user.email).FirstOrDefault();
+            var userFound = _user.Find(u => u.id == user.id).FirstOrDefault();
             if (userFound == null)
             {
                 return null;
             }
 
-            //created successfull respponse
-            var token = new
-            {
-                status = true,
-                message = "User successfully authenticated",
-                token = _jwtService.Authenticate(Convert.ToString(userFound.id), userFound.email),
-                data = userFound
-            };
+            var filter = Builders<User>.Filter.Eq("id", id);
+            var update = Builders<User>.Update
+                         .Set(u=> u.name, user.name)
+                         .Set(u=> u.surname, user.surname)
+                         .Set(u=> u.organization, user.organization);
 
-            return token;
+            var userUpdated = _user.FindOneAndUpdate<User>(filter, update);
+
+            //created successfull respponse
+            return userUpdated;
 
         }
 

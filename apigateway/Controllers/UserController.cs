@@ -30,23 +30,45 @@ namespace api_gateway.Controllers
         [HttpGet("{id}")]
         public ActionResult<object> GetUser(string id)
         {
-            return _user.GetUser(id);
+
+            var userFound = _user.GetUser(id);
+            if(userFound == null){
+                return StatusCode(403, new
+                {
+                    status = false,
+                    message = "User was not found",
+                    data = false
+                });
+            }
+
+            return StatusCode(200, new
+            {
+                status = true,
+                message = "User was not found",
+                data = userFound
+            });
+            
         }
 
         [HttpPut("{id}")]
         public ActionResult<object> UpdateUser(string id, [FromBody]User user)
         {
-            if (string.IsNullOrEmpty(user.password))
-            {
+            var userExists = _user.GetUser(id);
+            if(userExists == null){
                 return StatusCode(403, new
                 {
                     status = false,
-                    message = "password  required",
+                    message = "User was not found",
                     data = false
                 });
             }
-            
-            return _user.GetUser(id);
+            var UpdateUser = _user.UpdateUser(user, id);
+            return StatusCode(200, new
+                   {
+                     status = true,
+                     message = "User was successfully updated",
+                     data = UpdateUser
+                  });
         }
 
         [HttpPost("{orgid}")]

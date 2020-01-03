@@ -30,34 +30,29 @@ class UserProfile extends React.Component {
       message: null
     },
     user: null,
-    loading: false
-
+    loading: false,
+    token: null
   }
 
   async UpdateUser(){
-      if(!this.state.email || !this.state.password){
-          return false
-      }
       this.setState({notification:{status: null, message: null}, loading: true})
       await this.submitUpdate()
   }
 
 
   async submitUpdate(){
-
-    var userObj = await JSON.parse(sessionStorage.getItem("DOPR_USER"));
-    this.setState({user: userObj});
     try {
         var data = this.state;
         delete data.notification
         delete data.loading
         delete data.user
         
-        let response = await axios.put(`${CONSTANTS.baseUrl}/api/v1/User/${this.state.user.id}`, data);
+        let response = await axios.put(`${CONSTANTS.baseUrl}/api/v1/User/${this.state.user.id}`, data, { headers: { Authorization: `Bearer ${this.state.token}` } });
         this.setState({notification:{status: "success", message: response.data.message}});
-
+      console.log(response)
     } catch(error){
-      this.setState({notification:{status: "danger", message: error.response.data.message}});
+     console.log(error)
+      // this.setState({notification:{status: "danger", message: error.response.data.message}});
     }
 
     this.setState({loading: false})
@@ -74,18 +69,49 @@ class UserProfile extends React.Component {
     return this.props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
   }
 
+  async getUser(){
+    this.setState({notification:{status: null, message: null}, loading: true})
+    
+    console.log(this.state.user)
+    try {
+      let response = await axios.get(`${CONSTANTS.baseUrl}/api/v1/User/${this.state.user.id}`, { headers: { Authorization: `Bearer ${this.state.token}` } });
+      if(response.data.status){
+        this.setState({
+          email: response.data.data.email,
+          username: response.data.data.username,
+          name: response.data.data.name,
+          surname: response.data.data.surname,
+          organization: response.data.data.organization,
+        });
+      }
+      this.setState({notification:{status: null, message: null}, loading: false})
+      
+    } catch(error){
+      console.log(error)
+      this.setState({notification:{status: "danger", message: error.response.data.message, loading: false}});
+    }
+  }
+
+  async componentWillMount(){
+    var userObj = await JSON.parse(sessionStorage.getItem("DOPR_USER"));
+    var userToken = sessionStorage.getItem("DOPR_TOKEN");
+    this.setState({user: userObj, token: userToken});
+    await this.getUser();
+  }
+
   render() {
     return (
       <>
         <div className="content">
           <Row>
             <Col md="10" lg="10" sm="10">
+            <Form onSubmit={async (e)=>{e.preventDefault();await this.UpdateUser()}}>
               <Card>
                 <CardHeader>
                   <h5 className="title">Edit Profile</h5>
                 </CardHeader>
                 <CardBody>
-                  <Form>
+                  
                     <Row>
                       <Col className="pr-md-1" md="4" lg="4">
                         <FormGroup>
@@ -94,8 +120,9 @@ class UserProfile extends React.Component {
                             defaultValue={this.state.name}
                             placeholder="Name"
                             type="text"
+                            required
                             onChange={(e)=>{
-                              this.setState({name: e.target.value})
+                              this.setState({name: e.target.value.trim()})
                             }}
                           />
                         </FormGroup>
@@ -106,9 +133,10 @@ class UserProfile extends React.Component {
                           <Input
                             defaultValue={this.state.surname}
                             placeholder="Surname"
+                            required
                             type="text"
                             onChange={(e)=>{
-                              this.setState({name: e.target.value})
+                              this.setState({name: e.target.value.trim()})
                             }}
                           />
                         </FormGroup>
@@ -117,11 +145,12 @@ class UserProfile extends React.Component {
                         <FormGroup>
                           <label>Organization</label>
                           <Input
-                            defaultValue=""
+                            defaultValue={this.state.organization}
                             placeholder="Organization"
                             type="text"
+                            required
                             onChange={(e)=>{
-                              this.setState({name: e.target.value})
+                              this.setState({name: e.target.value.trim()})
                             }}
                             defaultValue={this.state.organization}
                           />
@@ -129,19 +158,20 @@ class UserProfile extends React.Component {
                       </Col>
                     </Row>
                     <Row>
-                      <Col className="pr-md-1" md="4" lg="4">
+                      <Col className="pr-md-1" md="6" lg="6">
                         <FormGroup>
                           <label htmlFor="exampleInputEmail1">
                             Email address
                           </label>
                           <Input placeholder="mike@email.com" type="email" onChange={(e)=>{
-                              this.setState({name: e.target.value})
+                              this.setState({name: e.target.value.trim()})
                             }}
+                            disabled
                             defaultValue={this.state.email}
                           />
                         </FormGroup>
                       </Col>
-                      <Col className="px-md-1" md="4" lg="4">
+                      <Col className="px-md-1" md="6" lg="6">
                         <FormGroup>
                           <label>Username</label>
                           <Input
@@ -150,26 +180,13 @@ class UserProfile extends React.Component {
                             type="text"
                             disabled
                             onChange={(e)=>{
-                              this.setState({password: e.target.value})
-                            }}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col className="pl-md-1" md="4" lg="4">
-                        <FormGroup>
-                          <label>Password</label>
-                          <Input
-                            defaultValue={this.state.password}
-                            placeholder="Password"
-                            type="text"
-                            onChange={(e)=>{
-                              this.setState({pasword: e.target.value})
+                              this.setState({password: e.target.value.trim()})
                             }}
                           />
                         </FormGroup>
                       </Col>
                     </Row>
-                  </Form>
+                  
                 </CardBody>
                 <CardFooter>
                   <Button className="btn-fill" color="primary" type="submit" disabled={this.state.loading}>
@@ -177,6 +194,7 @@ class UserProfile extends React.Component {
                   </Button>
                 </CardFooter>
               </Card>
+              </Form>
             </Col>
             <Col md="2" sm="2" lg="2">
               <Card className="card-user">

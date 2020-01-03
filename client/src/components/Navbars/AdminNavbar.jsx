@@ -132,7 +132,7 @@ class AdminNavbar extends React.Component {
                   </DropdownToggle>
                   <DropdownMenu className="dropdown-navbar" right tag="ul">
                     <NavLink tag="li" >
-                      <a href="/admin/settings"><DropdownItem className="nav-item">Settings</DropdownItem></a>
+                      <a href="/admin/profile"><DropdownItem className="nav-item">Settings</DropdownItem></a>
                     </NavLink>
                     <DropdownItem divider tag="li" />
                     <NavLink tag="li" onClick={()=>{this.logOutUser()}}>
