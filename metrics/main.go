@@ -16,5 +16,10 @@ func main(){
 	r.Use(gin.Recovery())
 
 	r.POST("/metrics", handlers.IngestData)
+	r.GET("/metrics", func(ctx *gin.Context){
+		fmt.Print("came through")
+		return
+	})
+
 	r.Run(":5001")
 }

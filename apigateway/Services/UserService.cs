@@ -34,7 +34,7 @@ namespace api_gateway.Services
         public object CreateUser(User user)
         {
             //search for user with this email first
-            var userFound = _user.Find<User>(u => u.email == user.email && u.organization == user.organization).FirstOrDefault();
+            var userFound = _user.Find<User>(u => u.email == user.email || u.username == user.username).FirstOrDefault();
             if (userFound != null)
             {
                 return new

@@ -23,7 +23,7 @@ namespace api_gateway.Services
         public User RegisterUser(User user)
         {
             //find user first
-            var userFound = _user.Find<User>(fuser => fuser.email == user.email).FirstOrDefault();
+            var userFound = _user.Find<User>(fuser => fuser.email == user.email || fuser.username == user.username).FirstOrDefault();
             if (userFound != null)
             {
                 return null;
@@ -47,6 +47,34 @@ namespace api_gateway.Services
         public object LoginUser(string email, string password)
         {
             var userFound = _user.Find(user => user.email == email).FirstOrDefault();
+            if (userFound == null)
+            {
+                return null;
+            }
+
+            //verify user password
+            var passwordValid = CryptoService.VerifyHashedPassword(userFound.password, password);
+            if (!passwordValid)
+            {
+                return null;
+            }
+            
+            //created successfull respponse
+            var token = new
+            {
+                status = true,
+                message = "User successfully authenticated",
+                token = _jwtService.Authenticate(Convert.ToString(userFound.id), userFound.email),
+                data = userFound
+            };
+
+            return token;
+
+        }
+
+        public object LoginUserConsole(string username, string password)
+        {
+            var userFound = _user.Find(user => user.username == username).FirstOrDefault();
             if (userFound == null)
             {
                 return null;

@@ -1,43 +1,16 @@
 {
   "ReRoutes": [
     {
-      "DownstreamPathTemplate": "/api/v1/demo/{catchAll}",
-      "DownstreamScheme": "http",
-      "UpstreamPathTemplate": "/{catchAll}",
+      "UpstreamPathTemplate": "/api/v1/data/{metrics}",
       "UpstreamHttpMethod": [ "Get", "Post", "Head", "Options", "Put", "Delete" ],
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "jsonplaceholder.typicode.com",
-          "Port": 80
-        }
-      ],
-      "QoSOptions": {
-        "ExceptionsAllowedBeforeBreaking": 3,
-        "DurationOfBreak": 5,
-        "TimeoutValue": 5000
-      },
-      "ReRouteIsCaseSensitive": false,
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "fgHGHGFHh47g344ryft6HGFH789khgfheriHH9384fkdfGFHFtkvjjhkgfSRHGFHGqw56yEFH",
-        "AllowedScopes": []
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/metrics/{metrics}",
+      "DownstreamPathTemplate": "/{metrics}",
       "DownstreamScheme": "http",
-      "UpstreamPathTemplate": "/{metrics}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Head", "Options", "Put", "Delete" ],
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
           "Port": 5001
         }
       ],
-      "QoSOptions": {
-        "ExceptionsAllowedBeforeBreaking": 3,
-        "DurationOfBreak": 5,
-        "TimeoutValue": 5000
-      },
       "ReRouteIsCaseSensitive": false,
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "fgHGHGFHh47g344ryft6HGFH789khgfheriHH9384fkdfGFHFtkvjjhkgfSRHGFHGqw56yEFH",

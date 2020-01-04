@@ -23,6 +23,7 @@ type ServerResp struct{
 	Data string `json:"data"`
 	Status string `json:"status"`
 	Error interface{} `json:"error"`
+	Token string `json:"token"`
 }
 
 func LoginUser(username, password string) error{
@@ -32,7 +33,7 @@ func LoginUser(username, password string) error{
 		color.Unset()
 		return nil
 	}
-	serverUrl := "http://localhost:5000/login"
+	serverUrl := "http://localhost:5000/api/v1/Auth/consolelogin"
 	payload := map[string]string{
 		"username": username,
 		"password": password,
@@ -57,7 +58,7 @@ func LoginUser(username, password string) error{
 		color.Unset()
 	}
 
-	persistToMem(username, serverResp.Data)
+	persistToMem(username, serverResp.Token)
 	color.Set(color.FgGreen, color.Bold)
 	fmt.Print("\r\nyou have successfully logged in\r\n")
 	color.Unset()
@@ -71,7 +72,7 @@ func persistToMem(username, token string){
 	return
 }
 
-func getMemObject()(*User, error){
+func GetMemObject()(*User, error){
 	var user *User
 	cache := cacheStore()
 	res, err := cache.Value("servertoken")

@@ -17,6 +17,7 @@ import {
 } from "reactstrap";
 import { Link, Redirect } from "react-router-dom";
 import * as axios from "axios";
+import auth from "../common/auth";
 
 class Login extends React.Component {
     state = {
@@ -56,9 +57,7 @@ class Login extends React.Component {
         
         let response = await axios.post(`${CONSTANTS.baseUrl}/api/v1/Auth/login`, data);
         this.setState({notification:{status: "success", message: response.data.message}});
-        sessionStorage.setItem("DOPR_USER", JSON.stringify(response.data.data))
-        sessionStorage.setItem("DOPR_TOKEN", String(response.data.token))
-
+        await auth.setSessionStorage(response)
         return this.props.history.push("/admin/dashboard")
 
       } catch(error){

@@ -44,7 +44,7 @@ namespace api_gateway.Controllers
                 return StatusCode(403, new
                 {
                     status = false,
-                    message = "User with the same email address is already registered. Try using another email account",
+                    message = "User with the same email address or username is already registered. Try using another email account",
                     data = false
                 });
                 
@@ -73,6 +73,34 @@ namespace api_gateway.Controllers
             }
             //get authentication response from service
             var _userCredsCorrect = _authService.LoginUser(User.email, User.password);
+            if(_userCredsCorrect == null){
+                return StatusCode(403, new
+                {
+                    status = false,
+                    message = "username and password combination are incorrect",
+                    data = false
+                });
+            }
+            
+            return StatusCode(200, _userCredsCorrect);
+
+        }
+
+        [HttpPost("consolelogin")]
+        [AllowAnonymous]
+        public ActionResult<User> LoginConsole([FromBody]User User)
+        {
+            if (string.IsNullOrEmpty(User.username) || string.IsNullOrEmpty(User.password))
+            {
+                return StatusCode(403, new
+                {
+                    status = false,
+                    message = "username and password are required for Logging in",
+                    data = false
+                });
+            }
+            //get authentication response from service
+            var _userCredsCorrect = _authService.LoginUserConsole(User.username, User.password);
             if(_userCredsCorrect == null){
                 return StatusCode(403, new
                 {

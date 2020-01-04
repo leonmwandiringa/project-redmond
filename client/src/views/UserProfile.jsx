@@ -41,6 +41,9 @@ class UserProfile extends React.Component {
 
 
   async submitUpdate(){
+
+    var cid = this.state.user.id
+    var tkn = this.state.token
     try {
         var data = this.state;
         delete data.notification
@@ -48,9 +51,9 @@ class UserProfile extends React.Component {
         delete data.user
         delete data.token
         
-        let response = await axios.put(`${CONSTANTS.baseUrl}/api/v1/User/${this.state.user.id}`, data, { headers: { Authorization: `Bearer ${this.state.token}` } });
+        let response = await axios.put(`${CONSTANTS.baseUrl}/api/v1/User/${cid}`, data, { headers: { Authorization: `Bearer ${tkn}` } });
         this.setState({notification:{status: "success", message: response.data.message}});
-      console.log(response)
+        await this.getUser()
     } catch(error){
      console.log(error)
       // this.setState({notification:{status: "danger", message: error.response.data.message}});
@@ -105,7 +108,7 @@ class UserProfile extends React.Component {
       <>
         <div className="content">
           <Row>
-            <Col md="10" lg="10" sm="10">
+            <Col md="11" lg="11" sm="11">
             <Form onSubmit={async (e)=>{e.preventDefault();await this.UpdateUser()}}>
               <Card>
                 <CardHeader>
@@ -197,7 +200,7 @@ class UserProfile extends React.Component {
               </Card>
               </Form>
             </Col>
-            <Col md="2" sm="2" lg="2">
+            <Col md="1" sm="1" lg="1" style={{padding: 0}}>
               <Card className="card-user">
                 <CardBody>
                   <Nav>

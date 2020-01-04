@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -67,4 +68,9 @@ func sortContainersMetrics(containers []string) (interface{}, error){
 		containersMetrics[container] = string(containerMetric)
 	}
 	return containersMetrics, nil
+}
+
+func GetStats() string{
+	stats, _ := os.Hostname()
+	return stats
 }

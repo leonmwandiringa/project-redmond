@@ -1,6 +1,7 @@
 import React from "react";
 // nodejs library that concatenates classes
 import classNames from "classnames";
+import auth from "../../common/auth";
 
 // reactstrap components
 import {
@@ -127,8 +128,9 @@ class AdminNavbar extends React.Component {
                     <div className="photo">
                       <img alt="..." src={require("assets/img/anime3.png")} />
                     </div>
+                    <span style={{margin: "0 10px"}}>{String(auth.getUser().username)}</span>
                     <b className="caret d-none d-lg-block d-xl-block" />
-                  <p className="d-lg-none">{this.state.user ? this.state.user.username : ""}</p>
+                  
                   </DropdownToggle>
                   <DropdownMenu className="dropdown-navbar" right tag="ul">
                     <NavLink tag="li" >
