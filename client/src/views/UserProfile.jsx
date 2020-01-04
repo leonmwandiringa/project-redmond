@@ -46,6 +46,7 @@ class UserProfile extends React.Component {
         delete data.notification
         delete data.loading
         delete data.user
+        delete data.token
         
         let response = await axios.put(`${CONSTANTS.baseUrl}/api/v1/User/${this.state.user.id}`, data, { headers: { Authorization: `Bearer ${this.state.token}` } });
         this.setState({notification:{status: "success", message: response.data.message}});
@@ -88,7 +89,7 @@ class UserProfile extends React.Component {
       
     } catch(error){
       console.log(error)
-      this.setState({notification:{status: "danger", message: error.response.data.message, loading: false}});
+      //this.setState({notification:{status: "danger", message: error.response.data.message, loading: false}});
     }
   }
 
