@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
+	"github.com/dopr/metrics/services"
 )
 
 func IngestData(c *gin.Context){
@@ -19,11 +22,15 @@ func IngestData(c *gin.Context){
 		return
 	}
 
-	fmt.Print(data)
-	c.JSON(http.StatusOK, gin.H{
-		"status": "success",
-		"message": "came through",
-		"data": data,
-		"error": nil,
-	})
+	//publish message
+	nc, err := services.GetNatsConnection()
+	if err != nil{
+		log.Fatalf("Error: an error occured pushing data", err)
+	}
+	byteData, _ := json.Marshal(data)
+	if err := nc.Publish("metrics", byteData); err != nil {
+		log.Fatal(err)
+	}
+
+	return
 }

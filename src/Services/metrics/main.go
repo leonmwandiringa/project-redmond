@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/dopr/metrics/handlers"
+	"github.com/dopr/metrics/services"
 )
 
 func init(){
 	fmt.Print("running in init")
-	//data.Connect()
+	services.ConnectToServer()
 }
 func main(){
 	r := gin.New()
