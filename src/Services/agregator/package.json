@@ -22,11 +22,13 @@
   "dependencies": {
     "@nestjs/common": "^6.7.2",
     "@nestjs/core": "^6.7.2",
+    "@nestjs/microservices": "^6.10.14",
     "@nestjs/mongoose": "^6.1.2",
     "@nestjs/platform-express": "^6.7.2",
     "@types/mongoose": "^5.5.30",
     "@types/twilio": "0.0.10",
     "mongoose": "^5.7.9",
+    "nats": "^1.3.2",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.0",
     "rxjs": "^6.5.3",

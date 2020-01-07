@@ -9,7 +9,7 @@ class Auth{
     }
 
     getUser(){
-        return this.user;
+        return this.user ? this.user : null;
     }
     async setSessionStorage(response){
         sessionStorage.setItem("DOPR_USER", JSON.stringify(response.data.data))

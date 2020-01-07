@@ -14,9 +14,11 @@ func GetNatsConnection()(*nats.Conn, error){
 }
 
 func ConnectToServer(){
-	nc, ncerr = nats.Connect(nats.DefaultURL)
+	nc, ncerr = nats.Connect("localhost:4222", nats.ErrorHandler(func(_ *nats.Conn, _ *nats.Subscription, err error) {
+		log.Printf("Error: %v", err)
+	}))
 	if ncerr != nil {
-		log.Fatal(ncerr)
+		log.Fatalf("an error occured con %s", ncerr)
 	}
-	defer nc.Close()
+	//defer nc.Close()
 }

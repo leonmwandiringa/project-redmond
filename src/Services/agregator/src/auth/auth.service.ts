@@ -13,37 +13,4 @@ export class AuthService{
         return await this._auth.findOne({cell: cell}).exec();
     }
 
-    async sendCode(cell: any){
-        let randomCode = Math.floor(100000 + Math.random() * 900000);
-        let userExist = await this._auth.findOne({cell: cell});
-        if(userExist){
-            await this._auth.findOneAndUpdate({cell: cell}, {verification: {code: randomCode, date: new Date()}})
-        }else{
-            await this._auth.create({cell: cell, verification: {code: randomCode, date: new Date()}})
-        }
-        return await this.processSms(cell, randomCode);
-    }
-
-    async processSms(cell, body){
-
-        client.messages
-        .create({
-            body: `${body}`,
-            from: '+15017122661',
-            to: `+27${cell}`
-        })
-        .then((message) => {
-            console.log(message)
-        });
-
-    }
-
-    async updateUser(user: any){
-        let userExist = await this._auth.findOne({cell: user.cell});
-        if(!userExist){
-            return null;
-        }
-        let updatedUser = await this._auth.findOneAndUpdate({cell: user.cell}, user);
-        return updatedUser;
-    }
 }

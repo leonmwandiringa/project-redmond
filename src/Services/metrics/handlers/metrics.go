@@ -2,11 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/dopr/metrics/services"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"github.com/dopr/metrics/services"
 )
 
 func IngestData(c *gin.Context){
@@ -29,8 +28,7 @@ func IngestData(c *gin.Context){
 	}
 	byteData, _ := json.Marshal(data)
 	if err := nc.Publish("metrics", byteData); err != nil {
-		log.Fatal(err)
+		log.Fatalf("an error occured", err)
 	}
-
 	return
 }
