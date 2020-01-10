@@ -1,0 +1,18 @@
+﻿version: '3.4'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: "sbsa-rabbitmq"
+    ports:
+      - "15672:15672"  # Important: In a production environment your should remove the external port
+      - "5672:5672"    # Important: In a production environment your should remove the external port
+    labels:
+      NAME: "sbsa-rabbitmq"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "dopr_rabbit_admin"
+      RABBITMQ_DEFAULT_PASS: "0dsaoFl6tdsfw0d43d"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    # volumes:
+    #   - "./enabled_plugins:/etc/rabbitmq/enabled_plugins"

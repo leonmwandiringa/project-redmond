@@ -1,0 +1,14 @@
+{
+  "name": "geofencing.api",
+  "version": "1.0.0",
+  "description": "Sensur geo fencing api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Leon Mwandiringa",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.5.5"
+  }
+}

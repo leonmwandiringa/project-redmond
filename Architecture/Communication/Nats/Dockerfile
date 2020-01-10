@@ -1,4 +1,4 @@
-FROM nats:latest
+FROM nats-streaming:latest
 EXPOSE 8222
 EXPOSE 6222
 EXPOSE 4222
