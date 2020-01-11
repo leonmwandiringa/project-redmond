@@ -18,6 +18,10 @@ func SendData() error{
 	payload["data"], _ = GetData()
 	payload["stats"] = GetStats()
 
+	loc, _ := time.LoadLocation("Africa/Johannesburg")
+	now := time.Now().In(loc)
+	payload["time"] = now
+
 	requestPayload, _ := json.Marshal(payload)
 	//_, err := http.Post(serverUrl,"application/json", bytes.NewBuffer(requestPayload))
 	token, tknerr := auth.GetMemObject()
