@@ -1,5 +1,6 @@
 var amqp = require('amqplib');
 let CONN_URL = `amqp://dopr_rabbit_admin:0dsaoFl6tdsfw0d43d@localhost:5672`;
+let influx = require("./db");
 
 async function listenForResults() {
   // connect to Rabbit MQ
@@ -16,25 +17,33 @@ async function listenForResults() {
 function pruneContainersData(containersData, server, time, userid){
   var containerIds = Object.keys(containersData)
   var containerMetrics = [];
+  let payload;
   for(let i = 0; i < containerIds.length; i++){
     //console.log(containerIds[i])
     if(containerIds[i] || containerIds[i] != ""){
-      containerMetrics.push({server_running: server, user_id: userid, time: time, container_id: containerIds[i], data: JSON.parse(containersData[containerIds[i]])[0]})
+      payload = {server_running: server, user_id: userid, time: time, container_id: containerIds[i], data: JSON.parse(containersData[containerIds[i]])[0]}
+      influx.addToDb(payload, userid, "container", server)
+      containerMetrics.push(payload)
     }
   }
-  console.log(containerMetrics)
+  
+  //console.log(containerMetrics)
 }
 
 function pruneImagesData(imagesData, server, time, userid){
   var imageIds = Object.keys(imagesData)
   var imageMetrics = [];
+  let payload;
   for(let i = 0; i < imageIds.length; i++){
     //console.log(containerIds[i])
     if(imageIds[i] || imageIds[i] != ""){
-      imageMetrics.push({server_running: server, user_id: userid, time: time, image_id: imageIds[i], data: JSON.parse(imagesData[imageIds[i]])[0]})
+      payload = {server_running: server, user_id: userid, time: time, image_id: imageIds[i], data: JSON.parse(imagesData[imageIds[i]])[0]}
+      influx.addToDb(payload, userid, "image", server)
+      imageMetrics.push(payload)
     }
   }
-  console.log(imageMetrics)
+  
+  //console.log(imageMetrics)
 }
 
 // consume messages from RabbitMQ
@@ -45,8 +54,8 @@ function consume({ connection, channel }) {
       let msgBody = msg.content.toString();
       let payload = JSON.parse(msgBody)
 
-      pruneContainersData(payload.data.data.container_metrics, payload.data.data.stats, payload.data.data.time, payload.user_id)
-      pruneImagesData(payload.data.data.image_metrics, payload.data.data.stats, payload.data.data.time, payload.user_id)
+      pruneContainersData(payload.data.data.container_metrics, payload.data.stats, payload.data.data.time, payload.user_id)
+      pruneImagesData(payload.data.data.image_metrics, payload.data.stats, payload.data.data.time, payload.user_id)
 
       // acknowledge message as received
       await channel.ack(msg);
