@@ -91,7 +91,6 @@ namespace api_gateway
                 };
             });
 
-
             //ocelot and polly circuit breaker implementation
             services.AddOcelot(Configuration)
                     .AddPolly();

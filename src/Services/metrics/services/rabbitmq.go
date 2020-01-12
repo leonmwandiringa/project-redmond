@@ -47,8 +47,12 @@ func InitAmqp() {
 	return
 }
 
-func PublishAmqpMessage(data interface{}) {
-	payload, _ := json.Marshal(data)
+func PublishAmqpMessage(data interface{}, userId string) {
+	dataObj := make(map[string]interface{})
+	dataObj["user_id"] = userId
+	dataObj["data"] = data
+
+	payload, _ := json.Marshal(dataObj)
 	err := ch.Publish(
 		"dopr-server-metrics", // exchange
 		"metrics",                // routing key

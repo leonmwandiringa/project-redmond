@@ -17,8 +17,7 @@
         "AllowedScopes": []
       },
       "AddHeadersToRequest": {
-        "Id": "Claims[Jti] &gt; value",
-        "Email": "Claims[Email] &gt; value"
+        "UserId": "Claims[jti] > value[1]"
       }
     }
   ],

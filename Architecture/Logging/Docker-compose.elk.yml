@@ -1,0 +1,38 @@
+﻿    
+version: '3.4'
+
+services:
+
+  elasticsearch:
+    build:
+      context: elasticsearch/
+    volumes:
+      - ./elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+
+  logstash:
+    build:
+      context: logstash/
+    volumes:
+      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline:ro
+    ports:
+      - "9090:9090"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    build:
+      context: kibana/
+    volumes:
+      - ./elk/kibana/config/:/usr/share/kibana/config:ro
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch

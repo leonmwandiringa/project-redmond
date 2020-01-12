@@ -1,14 +1,12 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/dopr/metrics/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func IngestData(c *gin.Context){
-
 	data := make(map[string]interface{})
 	if err := c.ShouldBind(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -19,8 +17,8 @@ func IngestData(c *gin.Context){
 		})
 		return
 	}
-	fmt.Println(c.Request.Header["Id"])
+	userId := c.GetHeader("UserId")
 	//publish message
-	services.PublishAmqpMessage(data)
+	services.PublishAmqpMessage(data, userId)
 	return
 }

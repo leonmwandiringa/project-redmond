@@ -51,8 +51,10 @@ func sortImagesMetrics(images []string) (interface{}, error){
 		return imagesMetrics, errors.New("there are no images currently")
 	}
 	for _, image := range images{
-		imageMetric, _ := exec.Command("docker", "image", "inspect", image).CombinedOutput()
-		imagesMetrics[image] = string(imageMetric)
+		if len(strings.TrimSpace(image)) != 0{
+			imageMetric, _ := exec.Command("docker", "image", "inspect", image).CombinedOutput()
+			imagesMetrics[image] = string(imageMetric)
+		}
 	}
 
 	return imagesMetrics, nil
@@ -64,8 +66,10 @@ func sortContainersMetrics(containers []string) (interface{}, error){
 		return containersMetrics, errors.New("there are no containers currently")
 	}
 	for _, container := range containers{
-		containerMetric, _ := exec.Command("docker", "container", "inspect", container).CombinedOutput()
-		containersMetrics[container] = string(containerMetric)
+		if len(strings.TrimSpace(container)) != 0 {
+			containerMetric, _ := exec.Command("docker", "container", "inspect", container).CombinedOutput()
+			containersMetrics[container] = string(containerMetric)
+		}
 	}
 	return containersMetrics, nil
 }
