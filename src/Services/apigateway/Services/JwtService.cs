@@ -35,7 +35,7 @@ namespace api_gateway.Services
                     _settings.Value.Issuer,
                     _settings.Value.Issuer,
                     claims,
-                    expires: DateTime.UtcNow.AddMinutes(_settings.Value.ExpiresInMinutes),
+                    expires: DateTime.UtcNow.AddDays(_settings.Value.ExpiresInMinutes),
                     signingCredentials: new SigningCredentials(key, _settings.Value.SecurityAlgorithm)
                 );
             //merge and set public token
