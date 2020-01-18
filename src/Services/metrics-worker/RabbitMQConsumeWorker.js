@@ -1,6 +1,7 @@
 var amqp = require('amqplib');
 let CONN_URL = `amqp://dopr_rabbit_admin:0dsaoFl6tdsfw0d43d@localhost:5672`;
-let influx = require("./db");
+//let influx = require("./InfluxDB");
+let { UserContainers, UserImages} = require("./MongoDb");
 
 async function listenForResults() {
   // connect to Rabbit MQ
@@ -14,36 +15,35 @@ async function listenForResults() {
   await consume({ connection, channel });
 }
 
-function pruneContainersData(containersData, server, time, userid){
+async function pruneContainersData(containersData, server, time, userid){
   var containerIds = Object.keys(containersData)
   var containerMetrics = [];
   let payload;
   for(let i = 0; i < containerIds.length; i++){
     //console.log(containerIds[i])
     if(containerIds[i] || containerIds[i] != ""){
-      payload = {server_running: server, user_id: userid, time: time, container_id: containerIds[i], data: JSON.parse(containersData[containerIds[i]])[0]}
-      influx.addToDb(payload, userid, "container", server)
+      payload = {'server_name': server, 'user_id': userid, metrics: { data: JSON.parse(containersData[containerIds[i]])[0], container_id: containerIds[i], time: time}}
+      //influx.addToDb(payload, userid, "container", server)
       containerMetrics.push(payload)
     }
   }
-  
+  await persistToMongoContainer(containerMetrics)
   //console.log(containerMetrics)
 }
 
-function pruneImagesData(imagesData, server, time, userid){
+async function pruneImagesData(imagesData, server, time, userid){
   var imageIds = Object.keys(imagesData)
   var imageMetrics = [];
   let payload;
   for(let i = 0; i < imageIds.length; i++){
     //console.log(containerIds[i])
     if(imageIds[i] || imageIds[i] != ""){
-      payload = {server_running: server, user_id: userid, time: time, image_id: imageIds[i], data: JSON.parse(imagesData[imageIds[i]])[0]}
-      influx.addToDb(payload, userid, "image", server)
+      payload = {'server_name': server, 'user_id': userid, metrics: {data: JSON.parse(imagesData[imageIds[i]])[0], image_id: imageIds[i], time: time}}
+      //influx.addToDb(payload, userid, "image", server)
       imageMetrics.push(payload)
     }
   }
-  
-  //console.log(imageMetrics)
+  await persistToMongoImage(imageMetrics)
 }
 
 // consume messages from RabbitMQ
@@ -54,9 +54,8 @@ function consume({ connection, channel }) {
       let msgBody = msg.content.toString();
       let payload = JSON.parse(msgBody)
 
-      pruneContainersData(payload.data.data.container_metrics, payload.data.stats, payload.data.data.time, payload.user_id)
-      pruneImagesData(payload.data.data.image_metrics, payload.data.stats, payload.data.data.time, payload.user_id)
-
+      pruneContainersData(payload.data.data.container_metrics, payload.data.stats, payload.time, payload.user_id)
+      pruneImagesData(payload.data.data.image_metrics, payload.data.stats, payload.time, payload.user_id)
       // acknowledge message as received
       await channel.ack(msg);
     });
@@ -71,5 +70,26 @@ function consume({ connection, channel }) {
       return reject(err);
     });
   });
+}
+
+async function persistToMongoContainer(payload){
+  for(var i = 0; i < payload.length; i++){
+    let ServerForUser = await UserContainers.findOne({'user_id': payload[i].user_id, 'server_name': payload[i].server_name})
+    if(ServerForUser){
+      return await UserContainers.findOneAndUpdate({'user_id': payload[i].user_id, 'server_name': payload[i].server_name}, {$push:{metrics: payload[i].metrics}})
+    }
+    return await UserContainers.create({'user_id': payload[i].user_id, 'server_name': payload[i].server_name, metrics: [payload[i].metrics]})
+  }
+    
+}
+
+async function persistToMongoImage(payload){
+  for(var i = 0; i < payload.length; i++){
+    let ServerForUser = await UserImages.findOne({'user_id': payload[i].user_id, 'server_name': payload[i].server_name})
+    if(ServerForUser){
+      return await UserImages.findOneAndUpdate({'user_id': payload[i].user_id, 'server_name': payload[i].server_name}, {$push:{metrics: payload[i].metrics}})
+    }
+    return await UserImages.create({'user_id': payload[i].user_id, 'server_name': payload[i].server_name, metrics: [payload[i].metrics]})
+  }
 }
 listenForResults()

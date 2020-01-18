@@ -8,7 +8,7 @@ const influx= new Influx.InfluxDB({
     schema: [
         {
           measurement: 'stats',
-          fields: { data: Influx.FieldType.STRING },
+          fields: { data: Influx.FieldType.STRING, time: Influx.FieldType.INTEGER  },
           tags: ['userid', 'server', 'type']
         }
       ]
@@ -33,7 +33,7 @@ class InfluxDb{
                     server: server, 
                     type: type
                 },     
-                fields: {data: JSON.stringify(data)}
+                fields: {data: JSON.stringify(data), time: Date.now()}
             } 
         ]).then(() => {   
             console.log('Added data to the Db', userid, type, server);         

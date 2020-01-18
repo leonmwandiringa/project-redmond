@@ -1,6 +1,5 @@
-import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+
 let Influx = require("influx");
 const influx= new Influx.InfluxDB({
     host: 'localhost',
@@ -11,7 +10,7 @@ const influx= new Influx.InfluxDB({
     schema: [
         {
           measurement: 'stats',
-          fields: { data: Influx.FieldType.STRING },
+          fields: { data: Influx.FieldType.STRING, time: Influx.FieldType.INTEGER },
           tags: ['userid', 'server', 'type']
         }
       ]
@@ -19,7 +18,7 @@ const influx= new Influx.InfluxDB({
 
 @Injectable()
 export class MetricService{
-    constructor(@InjectModel('Metric') private readonly _metric: Model<any>){
+    constructor(){
         influx.getDatabaseNames()
         .then(names=>{
             console.log(names)
@@ -31,19 +30,20 @@ export class MetricService{
 
     async getUserServerContainerMetrics(id: any){
         influx.query(
-            `select * from stats where userid=${id}`
+            `SELECT * FROM doprstats WHERE userid=${id}`
         )
         .catch(err=>{
-            console.log(err);
+            console.log("fsdfsdfsd", err);
         })
         .then(results=>{
+            console.log(results)
             return results;
         }); 
     }
 
     async getUserServerImageMetrics(id: any){
         influx.query(
-            `select * from stats where userid=${id}`
+            `select * from doprstats where userid=${id}`
         )
         .catch(err=>{
             console.log(err);

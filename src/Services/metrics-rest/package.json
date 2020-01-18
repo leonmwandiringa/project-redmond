@@ -1,8 +1,8 @@
 {
-  "name": "core",
+  "name": "metrics-rest",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Leon mwandiringa",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
