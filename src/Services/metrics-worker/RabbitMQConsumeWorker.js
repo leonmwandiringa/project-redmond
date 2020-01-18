@@ -54,8 +54,8 @@ function consume({ connection, channel }) {
       let msgBody = msg.content.toString();
       let payload = JSON.parse(msgBody)
 
-      pruneContainersData(payload.data.data.container_metrics, payload.data.stats, payload.time, payload.user_id)
-      pruneImagesData(payload.data.data.image_metrics, payload.data.stats, payload.time, payload.user_id)
+      pruneContainersData(payload.data.data.container_metrics, payload.data.stats, payload.data.time, payload.user_id)
+      pruneImagesData(payload.data.data.image_metrics, payload.data.stats, payload.data.time, payload.user_id)
       // acknowledge message as received
       await channel.ack(msg);
     });
@@ -76,9 +76,11 @@ async function persistToMongoContainer(payload){
   for(var i = 0; i < payload.length; i++){
     let ServerForUser = await UserContainers.findOne({'user_id': payload[i].user_id, 'server_name': payload[i].server_name})
     if(ServerForUser){
-      return await UserContainers.findOneAndUpdate({'user_id': payload[i].user_id, 'server_name': payload[i].server_name}, {$push:{metrics: payload[i].metrics}})
+      // UserContainers.update({'user_id': payload[i].user_id, 'server_name': payload[i].server_name}, { $pull: { "metrics": { "container_id": payload.metrics[i].container_id } }}, { safe: true, multi:true })
+      await UserContainers.findOneAndUpdate({'user_id': payload[i].user_id, 'server_name': payload[i].server_name}, {$push:{metrics: payload[i].metrics}})
+      return;
     }
-    return await UserContainers.create({'user_id': payload[i].user_id, 'server_name': payload[i].server_name, metrics: [payload[i].metrics]})
+      await UserContainers.create({'user_id': payload[i].user_id, 'server_name': payload[i].server_name, metrics: [payload[i].metrics]})
   }
     
 }
@@ -87,9 +89,12 @@ async function persistToMongoImage(payload){
   for(var i = 0; i < payload.length; i++){
     let ServerForUser = await UserImages.findOne({'user_id': payload[i].user_id, 'server_name': payload[i].server_name})
     if(ServerForUser){
-      return await UserImages.findOneAndUpdate({'user_id': payload[i].user_id, 'server_name': payload[i].server_name}, {$push:{metrics: payload[i].metrics}})
+      // await UserImages.update({'user_id': payload[i].user_id, 'server_name': payload[i].server_name}, { $pull: { "metrics": { "image_id": payload[i].metrics.image_id } }}, { safe: true, multi:true })
+      await UserImages.findOneAndUpdate({'user_id': payload[i].user_id, 'server_name': payload[i].server_name}, {$push: { metrics: payload[i].metrics }})
+      return;
     }
-    return await UserImages.create({'user_id': payload[i].user_id, 'server_name': payload[i].server_name, metrics: [payload[i].metrics]})
+      await UserImages.create({'user_id': payload[i].user_id, 'server_name': payload[i].server_name, metrics: [payload[i].metrics]})
+    
   }
 }
 listenForResults()
