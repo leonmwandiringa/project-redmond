@@ -64,7 +64,7 @@ class Sidebar extends React.Component {
                     onClick={this.props.toggleSidebar}
                   >
                     <i className={prop.icon} />
-                    <p>{prop.name}</p>
+                    <p class="tabname">{prop.name}</p>
                   </NavLink>
                 </li>
               );

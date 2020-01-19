@@ -8,11 +8,12 @@ export class StatController{
     
     @Get('/')
     async findUser(@Res() res: Response, @Req() req: Request){
-        let getStats = await this._statService.getStats();
+        let requestingUser = req.headers["userid"]
+        let getStats = await this._statService.getContainerStats(requestingUser);
 
         return res.status(200).json({
             error: null,
-            message: "user was found",
+            message: "user servers metrics were found",
             status: true,
             data: getStats
         });

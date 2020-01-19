@@ -19,10 +19,10 @@ func GetData() (interface{}, error){
 	}
 	dataToSend := make(map[string]interface{})
 	
-	imageMetrics, _ := sortImagesMetrics(getImages())
+	//imageMetrics, _ := sortImagesMetrics(getImages())
 	containerMetrics, _ := sortContainersMetrics(getContainers())
 	dataToSend["container_metrics"] = containerMetrics
-	dataToSend["image_metrics"] = imageMetrics
+	//dataToSend["image_metrics"] = imageMetrics
 
 	return dataToSend,nil
 }
@@ -36,29 +36,29 @@ func getContainers() []string{
 	return containers
 }
 
-func getImages() []string{
-	var allImages []string
-	images, _ := exec.Command("docker", "image", "ls", "-aq").CombinedOutput()
-	for _, image := range strings.Split(string(images), "\n"){
-		allImages = append(allImages, image)
-	}
-	return allImages
-}
+// func getImages() []string{
+// 	var allImages []string
+// 	images, _ := exec.Command("docker", "image", "ls", "-aq").CombinedOutput()
+// 	for _, image := range strings.Split(string(images), "\n"){
+// 		allImages = append(allImages, image)
+// 	}
+// 	return allImages
+// }
 
-func sortImagesMetrics(images []string) (interface{}, error){
-	imagesMetrics := make(map[string]interface{})
-	if images == nil || len(images) < 1{
-		return imagesMetrics, errors.New("there are no images currently")
-	}
-	for _, image := range images{
-		if len(strings.TrimSpace(image)) != 0{
-			imageMetric, _ := exec.Command("docker", "image", "inspect", image).CombinedOutput()
-			imagesMetrics[image] = string(imageMetric)
-		}
-	}
+// func sortImagesMetrics(images []string) (interface{}, error){
+// 	imagesMetrics := make(map[string]interface{})
+// 	if images == nil || len(images) < 1{
+// 		return imagesMetrics, errors.New("there are no images currently")
+// 	}
+// 	for _, image := range images{
+// 		if len(strings.TrimSpace(image)) != 0{
+// 			imageMetric, _ := exec.Command("docker", "image", "inspect", image).CombinedOutput()
+// 			imagesMetrics[image] = string(imageMetric)
+// 		}
+// 	}
 
-	return imagesMetrics, nil
-}
+// 	return imagesMetrics, nil
+// }
 
 func sortContainersMetrics(containers []string) (interface{}, error){
 	containersMetrics := make(map[string]interface{})

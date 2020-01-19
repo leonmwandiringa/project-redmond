@@ -16,12 +16,22 @@
   margin-left: 25px;
 
 }
+.sidebar .tabname{
+  display: none !important;
+}
+.sidebar:hover .tabname{
+  display: inline-block !important;
+}
+.sidebar:hover{
+  width: 200px;
+}
 .sidebar,
 .off-canvas-sidebar{
   @include linear-gradient($primary-states, $primary);
   height: calc(100vh - 90px);
-  width: 230px;
+  width: 90px;
   position: fixed;
+  transition: 1s all;
   top: 0;
   left: 0;
   z-index: 1;
@@ -459,7 +469,7 @@
   }
 
   > .content {
-    padding: 78px 30px 30px 280px;
+    padding: 80px 80px 30px 120px;
     min-height: calc(100vh - 70px);
   }
 

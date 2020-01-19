@@ -7,8 +7,8 @@ export class StatService{
     constructor(@InjectModel('UserContainer') private readonly _userContainer: Model<any>, @InjectModel('UserImage') private readonly _userImage: Model<any>){
     }
 
-    async getStats(){
-        await this._userContainer.find().exec();
+    async getContainerStats(userid){
+        return await this._userContainer.find({user_id: userid}).exec();
     }
 
 }

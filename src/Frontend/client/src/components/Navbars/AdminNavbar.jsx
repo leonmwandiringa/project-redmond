@@ -128,7 +128,7 @@ class AdminNavbar extends React.Component {
                     <div className="photo">
                       <img alt="..." src={require("assets/img/anime3.png")} />
                     </div>
-                    <span style={{margin: "0 10px"}}>{String(auth.getUser().username) || ""}</span>
+                    <span style={{margin: "0 10px"}}>{auth.getUser() ? auth.getUser().username : ""}</span>
                     <b className="caret d-none d-lg-block d-xl-block" />
                   
                   </DropdownToggle>

@@ -1,4 +1,5 @@
 import Dashboard from "views/Dashboard.jsx";
+import ServerMetrics from "views/ServerMetrics.jsx";
 import UserProfile from "views/UserProfile.jsx";
 import Login from "views/Login.jsx";
 import Register from "views/Register.jsx";
@@ -11,6 +12,14 @@ var routes = [
     component: Dashboard,
     layout: "/admin",
     sidebar: true
+  },
+  {
+    path: "/metrics/:server",
+    name: "Metrics",
+    icon: "tim-icons icon-chart-pie-36",
+    component: ServerMetrics,
+    layout: "/admin",
+    sidebar: false
   },
   {
     path: "/profile",
