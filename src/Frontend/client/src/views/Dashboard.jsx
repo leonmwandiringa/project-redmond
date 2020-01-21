@@ -60,6 +60,16 @@ class Dashboard extends React.Component {
     this.getUserServers()
   }
 
+  getserverObj(servername){
+    let thisServer;
+    this.state.data.forEach((val, index)=>{
+      if(val.server_name == servername){
+        thisServer = val
+      }
+    });
+    return thisServer
+  }
+
   rendersServers(){
     console.log(this.state.data)
     let serverVals = this.state.data
@@ -70,7 +80,7 @@ class Dashboard extends React.Component {
             <p className="">Containers: {val.metrics.length}</p>
           </td>
           <td className="td-actions text-right">
-            <Link to={`/admin/metrics/${val.server_name}`}>
+            <Link to={{pathname: `/admin/metrics/${val.server_name}`, state: {data: this.getserverObj(val.server_name)}}}>
               <Button
                 color="link"
                 id="tooltip636901683"

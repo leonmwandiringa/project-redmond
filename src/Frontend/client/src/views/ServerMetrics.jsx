@@ -37,14 +37,20 @@ class Dashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      bigChartData: "data1"
+      bigChartData: "data1",
+      data: null
     };
   }
   setBgChartData = name => {
     this.setState({
-      bigChartData: name
+      bigChartData: name,
+      data: null
     });
   };
+  componentDidMount(){
+    const { data } = this.props.location.state;
+    this.setState({data: data})
+  }
   render() {
     return (
       <>
