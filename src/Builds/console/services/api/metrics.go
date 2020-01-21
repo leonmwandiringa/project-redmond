@@ -61,14 +61,16 @@ func getContainers() []string{
 // }
 
 func sortContainersMetrics(containers []string) (interface{}, error){
-	containersMetrics := make(map[string]interface{})
+	//containersMetrics := make(map[string]interface{})
+	var containersMetrics []interface{}
 	if containers == nil || len(containers) < 1{
 		return containersMetrics, errors.New("there are no containers currently")
 	}
 	for _, container := range containers{
 		if len(strings.TrimSpace(container)) != 0 {
 			containerMetric, _ := exec.Command("docker", "container", "inspect", container).CombinedOutput()
-			containersMetrics[container] = string(containerMetric)
+			containersMetrics = append(containersMetrics, string(containerMetric))
+			//containersMetrics[container] = string(containerMetric)
 		}
 	}
 	return containersMetrics, nil

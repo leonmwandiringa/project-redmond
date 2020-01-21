@@ -16,29 +16,13 @@ import (
 
 func SendData() error{
 	serverUrl := "http://localhost:5000/api/v1/data/metrics"
-	payload := make(map[string]interface{})
 
-	payload["changes"] = map[string]bool{
-		"data": true,
-		"stats": true,
+	//create payload for sending
+	//return nil if nothing within payload has changed
+	stateHasChanged, payload := createPayload()
+	if !stateHasChanged{
+		return nil
 	}
-	payload["data"], _ = GetData()
-	payload["stats"] = GetStats()
-
-	dataObject, containerErr := GetStatMemObject("container_data")
-	if containerErr != nil{
-		persistStatToMem(payload["data"], "container_data")
-	}
-	statObject, statErr := GetStatMemObject("stat_data")
-	if statErr != nil{
-		persistStatToMem(payload["stats"], "stat_data")
-	}
-
-
-
-	loc, _ := time.LoadLocation("Africa/Johannesburg")
-	now := time.Now().In(loc)
-	payload["time"] = now
 
 	requestPayload, _ := json.Marshal(payload)
 	//_, err := http.Post(serverUrl,"application/json", bytes.NewBuffer(requestPayload))
@@ -66,8 +50,56 @@ func SendData() error{
 	}
 
 	defer resp.Body.Close()
-
 	return nil
+}
+
+//create payload metric
+func createPayload()(bool, interface{}){
+	payload := make(map[string]interface{})
+	var sendData bool = true
+
+	payloadChanges := map[string]bool{
+		"container_data": false,
+		"stats_data": false,
+	}
+	payload["container_data"], _ = GetData()
+	payload["stats_data"] = GetStats()
+
+	_, containerErr := GetStatMemObject("container_data")
+	if containerErr != nil{
+		persistStatToMem(payload["container_data"], "container_data")
+		payloadChanges["container_data"] = true
+	}else{
+		containerStatChanged, _ := compareChangeInObj(payload["container_data"], "container_data")
+		payloadChanges["container_data"] = containerStatChanged
+	}
+
+	_, statErr := GetStatMemObject("stats_data")
+	if statErr != nil{
+		persistStatToMem(payload["stats_data"], "stats_data")
+		payloadChanges["stats_data"] = true
+	}else{
+		StatsChanged, _ := compareChangeInObj(payload["stats_data"], "stats_data")
+		payloadChanges["stats_data"] = StatsChanged
+	}
+
+	if payloadChanges["container_data"] == false{
+		payload["container_data"] = nil
+	}
+	if payloadChanges["stats_data"] == false{
+		payload["stats_data"] = nil
+	}
+
+	payload["changes"] = payloadChanges
+	loc, _ := time.LoadLocation("Africa/Johannesburg")
+	now := time.Now().In(loc)
+	payload["time"] = now
+
+	if(payloadChanges["container_data"] == false && payloadChanges["stats_data"] == false){
+		sendData = false
+	}
+
+	return sendData, payload
 }
 
 func compareChangeInObj(newMetric interface{}, name string)(bool, error){
@@ -93,7 +125,6 @@ func areEqualJSON(s1, s2 interface{}) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("Error mashalling string 2 :: %s", err.Error())
 	}
-
 	return reflect.DeepEqual(o1, o2), nil
 }
 
@@ -104,16 +135,18 @@ func persistStatToMem(objToPersist interface{}, name string){
 	return
 }
 
-func GetStatMemObject(name string)(interface{}, error){
-	var persistObj interface{}
+func GetStatMemObject(name string)(*interface{}, error){
+	var persistObj *interface{}
 	cache := cacheStore()
 	res, err := cache.Value(name)
+
 	if err != nil{
 		color.Set(color.FgRed, color.Bold)
-		fmt.Print("\r\nan error ooccured persisting to memory\r\n")
+		fmt.Printf("\r\nan error occured getting from memory %s\r\n", name)
 		color.Unset()
 		return persistObj, err
 	}
+
 	dataPersisted := res.Data().(*interface{})
 	return dataPersisted, nil
 }

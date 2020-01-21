@@ -15,19 +15,24 @@ async function listenForResults() {
   await consume({ connection, channel });
 }
 
-async function pruneContainersData(containersData, server, time, userid){
-  var containerIds = Object.keys(containersData)
-  var containerMetrics = [];
-  let payload;
-  for(let i = 0; i < containerIds.length; i++){
-    //console.log(containerIds[i])
-    if(containerIds[i] || containerIds[i] != ""){
-      payload = {'server_name': server, 'user_id': userid, metrics: { data: JSON.parse(containersData[containerIds[i]])[0], container_id: containerIds[i], time: time}}
+async function pruneContainersData(payload){
+  //var containerIds = Object.keys(containersData)
+  //var containerMetrics = [];
+  let queMessage;
+  //for(let i = 0; i < containerIds.length; i++){
+    //if(containerIds[i] || containerIds[i] != ""){
+      queMessage = {'server_name': payload.data.stats_data, 'user_id': payload.user_id, 
+                      stats:payload.data.stats_data, metrics: { data: payload.data.container_data ? 
+                      payload.data.container_data.container_metrics : null, 
+                      time: payload.data.time}}
+      //payload = {'server_name': server, 'user_id': userid, stats:server, metrics: { data: changes.container_data ? JSON.parse(containersData[containerIds[i]])[0] : null, container_id: containerIds[i], time: time}}
       //influx.addToDb(payload, userid, "container", server)
-      containerMetrics.push(payload)
-    }
-  }
-  await persistToMongoContainer(containerMetrics)
+      //containerMetrics.push(payload)
+    //}
+  //}
+  await persistToMongoContainer(queMessage)
+  // await persistToMongoContainer(containerMetrics)
+
   //console.log(containerMetrics)
 }
 
@@ -54,7 +59,7 @@ function consume({ connection, channel }) {
       let msgBody = msg.content.toString();
       let payload = JSON.parse(msgBody)
 
-      pruneContainersData(payload.data.data.container_metrics, payload.data.stats, payload.data.time, payload.user_id)
+      pruneContainersData(payload)
       //pruneImagesData(payload.data.data.image_metrics, payload.data.stats, payload.data.time, payload.user_id)
       // acknowledge message as received
       await channel.ack(msg);
@@ -73,13 +78,15 @@ function consume({ connection, channel }) {
 }
 
 async function persistToMongoContainer(payload){
-  for(var i = 0; i < payload.length; i++){
+  //for(var i = 0; i < payload.length; i++){
+    // let update = payload.metrics.data ? {$push:{metrics: payload[i].metrics}, stats: payload.stats} : {stats: payload.stats}
       // await UserContainers.findOneAndUpdate({'user_id': payload[i].user_id, 'server_name': payload[i].server_name}, 
-      // { $pull: { "metrics.container_id": payload.metrics[i].container_id } }, { safe: true, multi:true })
+      // update, {upsert: true, new: true, runValidators: true})
 
-      await UserContainers.findOneAndUpdate({'user_id': payload[i].user_id, 'server_name': payload[i].server_name}, 
-      {$push:{metrics: payload[i].metrics}}, {upsert: true, new: true, runValidators: true})
-  }
+      let update = payload.metrics.data ? {metrics: payload.metrics, stats: payload.stats} : {stats: payload.stats}
+      await UserContainers.findOneAndUpdate({'user_id': payload.user_id, 'server_name': payload.server_name}, 
+      update, {upsert: true, new: true, runValidators: true})
+  //}
     
 }
 
