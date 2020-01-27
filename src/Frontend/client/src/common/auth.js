@@ -14,7 +14,7 @@ class Auth{
     getToken(){
         return this.token ? this.token : null;
     }
-    async setSessionStorage(response){
+    setSessionStorage(response){
         sessionStorage.setItem("DOPR_USER", JSON.stringify(response.data.data))
         sessionStorage.setItem("DOPR_TOKEN", String(response.data.token))
     }

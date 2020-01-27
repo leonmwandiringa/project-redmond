@@ -4,6 +4,6 @@ COPY package*.json ./
 
 RUN npm install nodemon -g
 RUN npm install
-
 COPY . .
-CMD [ "nodemon", "RabbitMQConsumeWorker" ]
+RUN npm run build
+CMD [ "nodemon", "dist/main.js" ]

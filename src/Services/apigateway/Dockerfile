@@ -1,20 +1,12 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-stretch-slim AS base
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/core/sdk:3.0 AS build
+WORKDIR /build
+COPY . .
+RUN dotnet restore
+RUN dotnet publish -c Release -o out
+
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.0 AS final
 EXPOSE 5000
 ENV ASPNETCORE_URLS http://*:5000
-
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2-stretch AS build
-WORKDIR /src
-COPY . .
-RUN dotnet restore "api-gateway.csproj"
-
-WORKDIR "/src/api-gateway"
-RUN dotnet build "api-gateway.csproj" -c Release -o /app
-
-FROM build AS publish
-RUN dotnet publish "api-gateway.csproj" -c Release -o /app
-
-FROM base AS final
 WORKDIR /app
-COPY --from=publish /app .
+COPY --from=build /build/out .
 ENTRYPOINT ["dotnet", "api-gateway.dll"]

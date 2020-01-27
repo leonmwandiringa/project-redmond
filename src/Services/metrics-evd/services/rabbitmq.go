@@ -23,7 +23,9 @@ var (
 func InitAmqp() {
 	var err error
 
-	conn, err = amqp.Dial("amqp://dopr_rabbit_admin:0dsaoFl6tdsfw0d43d@localhost")
+	conn, err = amqp.Dial("amqp://dopr_rabbit_admin:0dsaoFl6tdsfw0d43d@rabbitmq")
+	// conn, err = amqp.Dial("amqp://dopr_rabbit_admin:0dsaoFl6tdsfw0d43d@localhost")
+
 	failOnError(err, "Failed to connect to RabbitMQ")
 
 	ch, err = conn.Channel()

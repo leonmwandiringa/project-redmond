@@ -1,0 +1,75 @@
+version: '3.4'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: DOPR_Rabbitmq
+    ports:
+      - "15672:15672"  # Important: In a production environment your should remove the external port
+      - "5672:5672"    # Important: In a production environment your should remove the external port
+    labels:
+      NAME: "sbsa-rabbitmq"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "dopr_rabbit_admin"
+      RABBITMQ_DEFAULT_PASS: "0dsaoFl6tdsfw0d43d"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    networks:
+      - dopr
+
+  frontend:
+    build:
+      context: src/Frontend/client
+    container_name: DOPR_API_Frontend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    ports:
+      - "80:80"
+    restart: always
+    networks:
+      - dopr
+
+  apigateway:
+    build:
+      context: src/Services/apigateway
+    container_name: DOPR_API_Gateway
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    ports:
+      - "5000:5000"
+    restart: always
+    networks:
+      - dopr
+    
+  metrics-evd:
+    build:
+      context: src/Services/metrics-evd
+    container_name: DOPR_Metrics_Evd
+    ports:
+      - "5001:5001"
+    restart: always
+    networks:
+      - dopr
+    
+  metrics-rest:
+    build:
+      context: src/Services/metrics-rest
+    container_name: DOPR_Metrics_Rest
+    ports:
+      - "5002:5002"
+    restart: always
+    networks:
+      - dopr
+
+  metrics-worker:
+    build:
+      context: src/Services/metrics-worker
+    container_name: DOPR_Metrics_Worker
+    restart: always
+    networks:
+      - dopr
+
+
+networks:
+  dopr:
+    driver: bridge

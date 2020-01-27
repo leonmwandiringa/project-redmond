@@ -24,6 +24,9 @@ import {
   Col,
   UncontrolledTooltip
 } from "reactstrap";
+import * as axios from "axios";
+import auth from "../common/auth";
+import {CONSTANTS} from "../env";
 
 // core components
 import {
@@ -38,7 +41,9 @@ class Dashboard extends React.Component {
     super(props);
     this.state = {
       bigChartData: "data1",
-      data: null
+      data: null,
+      server: null,
+      containers: null
     };
   }
   setBgChartData = name => {
@@ -47,23 +52,59 @@ class Dashboard extends React.Component {
       data: null
     });
   };
-  componentDidMount(){
-    const { data } = this.props.location.state;
-    this.setState({data: data})
+
+  async getUserServer(server){
+    try {
+        var data;
+        var token = auth.getToken();
+        this.setState({loading: true})
+
+        let response = await axios.get(`${CONSTANTS.baseUrl}/api/v1/stats/stat/${server}`, {headers: { Authorization: `Bearer ${token}` }});
+        response.data.status || response.data.data ? this.setState({data: response.data.data}) : this.setState({data: null}) 
+    } catch(error){
+      this.setState({notification:{status: "danger", message: error.response.data.message}, loading: false});
+    }
+    this.setState({loading: false})
   }
+
+  async componentDidMount(){
+    const { server } = this.props.match.params
+    this.setState({server: server})
+    await this.getUserServer(server)
+    await this.renderContainers()
+  }
+
+  async renderContainers(){
+    console.log(this.state.data.metrics.data)
+    let containers = this.state.data.metrics.data
+    this.setState({containers: containers.map((val, index)=>{
+        return (<tr key={val.Id}>
+          <th>{"" || val.Id.slice(0, 10)}</th>
+          <th>{val.Name.slice(1)}</th>
+          <th>{val.Config.Image}</th>
+          <th>{(new Date(val.State.StartedAt)).toLocaleString()}</th>
+          <th>{val.State.Running == true ? "Running" : (val.State.Restarting == true ? "Restarting" : "Stopped")}</th>
+          <th>Ations</th>
+        </tr>)
+      })
+    })
+  }
+
   render() {
     return (
       <>
         <div className="content">
         <Row>
-            <Col xs="3">
+            <Col xs="6">
               <Card className="card-chart">
                 <CardHeader>
                   <Row>
-                    <Col className="text-left" sm="6">
                       {/* <h5 className="card-category">Server Metrics</h5> */}
                       <CardTitle tag="h2">Server Details</CardTitle>
-                    </Col>
+                      <ul class="list-group">
+                        <li class="">Servername: {this.state.data ? this.state.data.server_name : ""}</li>
+                        <li class="">Last Updated: {this.state.data ? (new Date(this.state.data.metrics.time)).toLocaleString() : ""}</li>
+                      </ul>
                   </Row>
                 </CardHeader>
                 <CardBody>
@@ -71,146 +112,18 @@ class Dashboard extends React.Component {
                 </CardBody>
               </Card>
             </Col>
-            <Col xs="3">
+            <Col xs="6">
               <Card className="card-chart">
                 <CardHeader>
                   <Row>
                     <Col className="text-left" sm="6">
                       <h5 className="card-category">Server Health</h5>
-                      <CardTitle tag="h2">Performance</CardTitle>
+                      <CardTitle tag="h2"></CardTitle>
                     </Col>
                   </Row>
                 </CardHeader>
                 <CardBody>
                   
-                </CardBody>
-              </Card>
-            </Col>
-            <Col xs="3">
-              <Card className="card-chart">
-                <CardHeader>
-                  <Row>
-                    <Col className="text-left" sm="6">
-                      <h5 className="card-category">Server Container</h5>
-                      <CardTitle tag="h2">Performance</CardTitle>
-                    </Col>
-                  </Row>
-                </CardHeader>
-                <CardBody>
-                  
-                </CardBody>
-              </Card>
-            </Col>
-            <Col xs="3">
-              <Card className="card-chart">
-                <CardHeader>
-                  <Row>
-                    <Col className="text-left" sm="6">
-                      <h5 className="card-category">Server Images</h5>
-                      <CardTitle tag="h2">Performance</CardTitle>
-                    </Col>
-                  </Row>
-                </CardHeader>
-                <CardBody>
-                  
-                </CardBody>
-              </Card>
-            </Col>
-          </Row>
-
-          
-          <Row>
-            <Col xs="12">
-              <Card className="card-chart">
-                <CardHeader>
-                  <Row>
-                    <Col className="text-left" sm="6">
-                      <h5 className="card-category">Server Metrics</h5>
-                      <CardTitle tag="h2">Performance</CardTitle>
-                    </Col>
-                    <Col sm="6">
-                      <ButtonGroup
-                        className="btn-group-toggle float-right"
-                        data-toggle="buttons"
-                      >
-                        <Button
-                          tag="label"
-                          className={classNames("btn-simple", {
-                            active: this.state.bigChartData === "data1"
-                          })}
-                          color="info"
-                          id="0"
-                          size="sm"
-                          onClick={() => this.setBgChartData("data1")}
-                        >
-                          <input
-                            defaultChecked
-                            className="d-none"
-                            name="options"
-                            type="radio"
-                          />
-                          <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                            Accounts
-                          </span>
-                          <span className="d-block d-sm-none">
-                            <i className="tim-icons icon-single-02" />
-                          </span>
-                        </Button>
-                        <Button
-                          color="info"
-                          id="1"
-                          size="sm"
-                          tag="label"
-                          className={classNames("btn-simple", {
-                            active: this.state.bigChartData === "data2"
-                          })}
-                          onClick={() => this.setBgChartData("data2")}
-                        >
-                          <input
-                            className="d-none"
-                            name="options"
-                            type="radio"
-                          />
-                          <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                            Purchases
-                          </span>
-                          <span className="d-block d-sm-none">
-                            <i className="tim-icons icon-gift-2" />
-                          </span>
-                        </Button>
-                        <Button
-                          color="info"
-                          id="2"
-                          size="sm"
-                          tag="label"
-                          className={classNames("btn-simple", {
-                            active: this.state.bigChartData === "data3"
-                          })}
-                          onClick={() => this.setBgChartData("data3")}
-                        >
-                          <input
-                            className="d-none"
-                            name="options"
-                            type="radio"
-                          />
-                          <span className="d-none d-sm-block d-md-block d-lg-block d-xl-block">
-                            Sessions
-                          </span>
-                          <span className="d-block d-sm-none">
-                            <i className="tim-icons icon-tap-02" />
-                          </span>
-                        </Button>
-                      </ButtonGroup>
-                    </Col>
-                  </Row>
-                </CardHeader>
-                <CardBody>
-                  <div className="chart-area">
-                    <Line
-                      data={chartExample1[this.state.bigChartData]}
-                      options={chartExample1.options}
-                    />
-                  </div>
                 </CardBody>
               </Card>
             </Col>
@@ -225,55 +138,16 @@ class Dashboard extends React.Component {
                   <Table className="tablesorter" responsive>
                     <thead className="text-primary">
                       <tr>
+                        <th>ID</th>
                         <th>Name</th>
-                        <th>Country</th>
-                        <th>City</th>
-                        <th className="text-center">Salary</th>
+                        <th>Image</th>
+                        <th>Created</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td>Dakota Rice</td>
-                        <td>Niger</td>
-                        <td>Oud-Turnhout</td>
-                        <td className="text-center">$36,738</td>
-                      </tr>
-                      <tr>
-                        <td>Minerva Hooper</td>
-                        <td>Curaçao</td>
-                        <td>Sinaai-Waas</td>
-                        <td className="text-center">$23,789</td>
-                      </tr>
-                      <tr>
-                        <td>Sage Rodriguez</td>
-                        <td>Netherlands</td>
-                        <td>Baileux</td>
-                        <td className="text-center">$56,142</td>
-                      </tr>
-                      <tr>
-                        <td>Philip Chaney</td>
-                        <td>Korea, South</td>
-                        <td>Overland Park</td>
-                        <td className="text-center">$38,735</td>
-                      </tr>
-                      <tr>
-                        <td>Doris Greene</td>
-                        <td>Malawi</td>
-                        <td>Feldkirchen in Kärnten</td>
-                        <td className="text-center">$63,542</td>
-                      </tr>
-                      <tr>
-                        <td>Mason Porter</td>
-                        <td>Chile</td>
-                        <td>Gloucester</td>
-                        <td className="text-center">$78,615</td>
-                      </tr>
-                      <tr>
-                        <td>Jon Porter</td>
-                        <td>Portugal</td>
-                        <td>Gloucester</td>
-                        <td className="text-center">$98,615</td>
-                      </tr>
+                      {this.state.containers}
                     </tbody>
                   </Table>
                 </CardBody>

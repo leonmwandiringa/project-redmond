@@ -3,7 +3,7 @@
 services:
   rabbitmq:
     image: rabbitmq:3-management
-    hostname: "sbsa-rabbitmq"
+    container_name: dopr_rabbitmq
     ports:
       - "15672:15672"  # Important: In a production environment your should remove the external port
       - "5672:5672"    # Important: In a production environment your should remove the external port

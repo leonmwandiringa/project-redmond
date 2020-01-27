@@ -6,7 +6,7 @@ import { Router, Route, Switch, Redirect } from "react-router-dom";
 import AdminLayout from "layouts/Admin.jsx";
 import AuthLayout from "layouts/Auth.jsx";
 
-import "assets/scss/black-dashboard-react.scss";
+import "assets/css/black-dashboard-react.css";
 import "assets/demo/demo.css";
 import "assets/css/nucleo-icons.css";
 

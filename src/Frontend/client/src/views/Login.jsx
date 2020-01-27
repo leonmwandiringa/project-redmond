@@ -57,8 +57,11 @@ class Login extends React.Component {
         
         let response = await axios.post(`${CONSTANTS.baseUrl}/api/v1/Auth/login`, data);
         this.setState({notification:{status: "success", message: response.data.message}});
-        await auth.setSessionStorage(response)
-        return this.props.history.push("/admin/dashboard")
+
+        auth.setSessionStorage(response)
+        setTimeout(()=>{
+          return this.props.history.push("/admin/dashboard")
+        }, 2000)
 
       } catch(error){
         this.setState({notification:{status: "danger", message: error.response.data.message}});

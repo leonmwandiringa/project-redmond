@@ -11,4 +11,8 @@ export class StatService{
         return await this._userContainer.find({user_id: userid}).exec();
     }
 
+    async getServerStat(userid, servername){
+        return await this._userContainer.findOne({user_id: userid, server_name: servername}).exec();
+    }
+
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"os"
 	"os/exec"
@@ -62,6 +63,7 @@ func getContainers() []string{
 
 func sortContainersMetrics(containers []string) (interface{}, error){
 	//containersMetrics := make(map[string]interface{})
+	var containerObj []interface{}
 	var containersMetrics []interface{}
 	if containers == nil || len(containers) < 1{
 		return containersMetrics, errors.New("there are no containers currently")
@@ -69,10 +71,13 @@ func sortContainersMetrics(containers []string) (interface{}, error){
 	for _, container := range containers{
 		if len(strings.TrimSpace(container)) != 0 {
 			containerMetric, _ := exec.Command("docker", "container", "inspect", container).CombinedOutput()
-			containersMetrics = append(containersMetrics, string(containerMetric))
-			//containersMetrics[container] = string(containerMetric)
+			json.Unmarshal(containerMetric, &containerObj)
+			containersMetrics = append(containersMetrics, containerObj...)
+
+			//containersMetrics[container] = containerObj
 		}
 	}
+
 	return containersMetrics, nil
 }
 

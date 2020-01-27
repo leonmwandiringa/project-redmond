@@ -31,11 +31,11 @@ class AdminNavbar extends React.Component {
   componentDidMount() {
     window.addEventListener("resize", this.updateColor);
   }
-  async componentWillMount(){
+  componentWillMount(){
     if(!sessionStorage.getItem("DOPR_USER") || !sessionStorage.getItem("DOPR_TOKEN")){
       return this.props.history.push("/auth/login")
     }
-    var userObj = await JSON.parse(sessionStorage.getItem("DOPR_USER"))
+    var userObj = JSON.parse(sessionStorage.getItem("DOPR_USER"))
     this.setState({user: userObj})
     this.setState({token: sessionStorage.getItem("DOPR_TOKEN")})
   }

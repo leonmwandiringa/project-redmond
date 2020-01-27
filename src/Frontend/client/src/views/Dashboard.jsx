@@ -56,7 +56,7 @@ class Dashboard extends React.Component {
     this.setState({loading: false})
   }
 
-  componentDidMount(){
+  componentWillMount(){
     this.getUserServers()
   }
 
@@ -113,7 +113,7 @@ class Dashboard extends React.Component {
                   <h6 className="title d-inline">Server/Instances</h6>
                 </CardHeader>
                 <CardBody>
-                  <div className="table-full-width table-responsive">
+                  <div className="table-full-width">
                     <Table>
                       <tbody>
                         {this.rendersServers()}
