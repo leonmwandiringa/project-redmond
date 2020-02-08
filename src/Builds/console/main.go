@@ -45,21 +45,27 @@ func main() {
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
 		cli.Author{
-			Name:  "Leon Mwandiringa",
-			Email: "leonmwandiringa@gmail.com",
+			Name:  "Techadon | Dopr",
+			Email: "info@dopr.io",
 		},
 	}
-	app.Copyright = "(c) 2019 Dopr"
-	app.Usage = "Containers management"
+	app.Copyright = fmt.Sprintf("(c) %d Dopr", time.Now().Year())
+	app.Usage = "Containers management, montiroing and Orchestration"
 	app.Commands = []cli.Command{
 		{
 			Name:  "start",
 			Usage: "runs deployment",
 			Action: func(c *cli.Context) error {
 
+				direrr, dir := getWD()
+				if direrr != nil{
+					color.Set(color.FgRed, color.Bold)
+					log.Fatalf("ERROR: an error occured getting current working directory \r\n %s", direrr)
+					color.Unset()
+				}
 				buildValidation := validation.Props{
 					Type:     "json",
-					Location: "Dopr.json",
+					Location: fmt.Sprintf("%s/Dopr.json", dir),
 				}
 				if !buildValidation.ValidateEnv() {
 					return nil
@@ -79,10 +85,16 @@ func main() {
 			Usage: "stops deployment",
 			Action: func(c *cli.Context) error {
 
+				direrr, dir := getWD()
+				if direrr != nil{
+					color.Set(color.FgRed, color.Bold)
+					log.Fatalf("ERROR: an error occured getting current working directory \r\n %s", direrr)
+					color.Unset()
+				}
 				buildValidation := validation.Props{
 					Type:     "json",
-					Location: "Dopr.json",
-				}
+					Location: fmt.Sprintf("%s/Dopr.json", dir),
+				} 
 
 				if !buildValidation.ValidateEnv() {
 					return nil
@@ -145,7 +157,13 @@ func main() {
 						return nil
 					}
 
-					return auth.LoginUser(username, password)
+					auth.LoginUser(username, password)
+					//schedule montior and connect to server
+					s := gocron.NewScheduler()
+					s.Every(30).Seconds().Do(api.SendData)
+					<- s.Start()
+
+					return nil
 			},
 		},
 	}
@@ -164,9 +182,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	s := gocron.NewScheduler()
-	s.Every(30).Seconds().Do(api.SendData)
-	<- s.Start()
+	
 
 }
 
@@ -209,6 +225,15 @@ func runContainers(config validation.Dopr) error {
 		containerBuild.CheckIfContainerRunning(config.Services_name, "running")
 	}
 	return nil
+}
+
+func getWD()(error, string){
+
+	dir, err := os.Getwd()
+	if err != nil {
+		return err, ""
+	}
+	return nil, dir
 }
 
 func stopContainers(config validation.Dopr) error {

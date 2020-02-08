@@ -26,12 +26,11 @@ type ServerResp struct{
 	Token string `json:"token"`
 }
 
-func LoginUser(username, password string) error{
+func LoginUser(username, password string){
 	if len(username) < 2 || len(password) < 2{
 		color.Set(color.FgRed, color.Bold)
 		log.Fatal("ERROR: username and password not filled in or is invalid\r\n")
 		color.Unset()
-		return nil
 	}
 	serverUrl := "http://localhost:5000/api/v1/Auth/consolelogin"
 	payload := map[string]string{
@@ -62,7 +61,6 @@ func LoginUser(username, password string) error{
 	color.Set(color.FgGreen, color.Bold)
 	fmt.Print("\r\nyou have successfully logged in\r\n")
 	color.Unset()
-	return nil
 }
 
 func persistToMem(username, token string){
