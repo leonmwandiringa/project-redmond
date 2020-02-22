@@ -13,8 +13,7 @@ type Definition struct {
 	Repository string
 	Source     string
 	Ports      []string
-	// Enviroment []KeyVal
-	// Policies   []KeyVal
+	Enviroment []KeyVal
 }
 
 type KeyVal struct {
@@ -22,6 +21,12 @@ type KeyVal struct {
 	Value string
 }
 
+/*
+* build passed container map one after another from defined loop
+* @returns exec.cmd memory address - commandline reults stream to stdoutput
+* @params services definition name
+* @object ref definition object
+ */
 func (image *Definition) BuildContainer(Services_name string) *exec.Cmd {
 	var cmd *exec.Cmd
 	color.Set(color.FgMagenta, color.Bold)

@@ -3,12 +3,12 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/jasonlvhit/gocron"
 	"github.com/dopr/console/services/api"
 	"github.com/dopr/console/services/auth"
 	"github.com/dopr/console/services/build"
 	"github.com/dopr/console/services/validation"
+	"github.com/fatih/color"
+	"github.com/jasonlvhit/gocron"
 	"github.com/urfave/cli"
 	"io"
 	"log"
@@ -18,6 +18,7 @@ import (
 	"time"
 )
 
+//main config file struct definition
 type Dopr struct {
 	Services_name string     `json:"services_name"`
 	Services      []Artifact `json:"services"`
@@ -38,6 +39,7 @@ type KeyVal struct {
 	Value string `json:"value"`
 }
 
+//////////
 func main() {
 	app := cli.NewApp()
 	app.Name = "Dopr"
@@ -57,12 +59,17 @@ func main() {
 			Usage: "runs deployment",
 			Action: func(c *cli.Context) error {
 
+				//get current working directory. havent been tested on all goos. might expect different behaviour on non unix or windows os
 				direrr, dir := getWD()
-				if direrr != nil{
+				if direrr != nil {
 					color.Set(color.FgRed, color.Bold)
 					log.Fatalf("ERROR: an error occured getting current working directory \r\n %s", direrr)
 					color.Unset()
+					return nil
 				}
+
+				//pass file location and parse.
+				//todo add yaml parser functionality and checks. if file is not present stop process
 				buildValidation := validation.Props{
 					Type:     "json",
 					Location: fmt.Sprintf("%s/Dopr.json", dir),
@@ -71,11 +78,12 @@ func main() {
 					return nil
 				}
 
+				//validate schema of file and get file values
 				configContents, err := buildValidation.ValidateFile()
 				if err != nil {
 					return nil
 				}
-
+				//boil down to running the containers
 				runContainers(configContents)
 				return nil
 			},
@@ -86,7 +94,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 
 				direrr, dir := getWD()
-				if direrr != nil{
+				if direrr != nil {
 					color.Set(color.FgRed, color.Bold)
 					log.Fatalf("ERROR: an error occured getting current working directory \r\n %s", direrr)
 					color.Unset()
@@ -94,7 +102,7 @@ func main() {
 				buildValidation := validation.Props{
 					Type:     "json",
 					Location: fmt.Sprintf("%s/Dopr.json", dir),
-				} 
+				}
 
 				if !buildValidation.ValidateEnv() {
 					return nil
@@ -117,53 +125,53 @@ func main() {
 				cli.BoolFlag{Name: "password, p"},
 			},
 			Action: func(c *cli.Context) error {
-					if len(c.Args()) < 3{
-						color.Set(color.FgRed, color.Bold)
-						log.Fatal("username and password are required to auntenticate to Dopr server")
-						color.Unset()
-						return nil
-					}
-					var (
-						username string
-						password string
-					)
-					if c.Args().Get(1) == "--username" || c.Args().Get(1) == "-u"{
-						username = c.Args().Get(2)
-						password = c.Args().Get(0)
-						color.Set(color.FgGreen, color.Bold)
-						fmt.Printf("Logging %s in\r\n", username)
-						color.Unset()
-					}else if c.Args().Get(1) == "--password" || c.Args().Get(1) == "-p"{
-						username = c.Args().Get(0)
-						password = c.Args().Get(2)
-						color.Set(color.FgGreen, color.Bold)
-						fmt.Printf("Logging %s to the server\r\n", username)
-						color.Unset()
-					}else{
-						color.Set(color.FgRed, color.Bold)
-						fmt.Print("invalid parameters were entered \r\n")
-						color.Unset()
+				if len(c.Args()) < 3 {
+					color.Set(color.FgRed, color.Bold)
+					log.Fatal("username and password are required to auntenticate to Dopr server")
+					color.Unset()
+					return nil
+				}
+				var (
+					username string
+					password string
+				)
+				if c.Args().Get(1) == "--username" || c.Args().Get(1) == "-u" {
+					username = c.Args().Get(2)
+					password = c.Args().Get(0)
+					color.Set(color.FgGreen, color.Bold)
+					fmt.Printf("Logging %s in\r\n", username)
+					color.Unset()
+				} else if c.Args().Get(1) == "--password" || c.Args().Get(1) == "-p" {
+					username = c.Args().Get(0)
+					password = c.Args().Get(2)
+					color.Set(color.FgGreen, color.Bold)
+					fmt.Printf("Logging %s to the server\r\n", username)
+					color.Unset()
+				} else {
+					color.Set(color.FgRed, color.Bold)
+					fmt.Print("invalid parameters were entered \r\n")
+					color.Unset()
 
-						log.Fatal("\r\n\r\nNAME:\r\n"+
-						"main.exe login - authenticates to dopr remote server\r\n\r\n"+
+					log.Fatal("\r\n\r\nNAME:\r\n" +
+						"main.exe login - authenticates to dopr remote server\r\n\r\n" +
 
-					"USAGE:\r\n"+
-						"   main.exe login [command options] [arguments...]"+
+						"USAGE:\r\n" +
+						"   main.exe login [command options] [arguments...]" +
 
-						"\r\n\r\nOPTIONS"+
-						"\r\n   --username, -u"+
+						"\r\n\r\nOPTIONS" +
+						"\r\n   --username, -u" +
 						"\r\n   --password, -p")
 
-						return nil
-					}
-
-					auth.LoginUser(username, password)
-					//schedule montior and connect to server
-					s := gocron.NewScheduler()
-					s.Every(30).Seconds().Do(api.SendData)
-					<- s.Start()
-
 					return nil
+				}
+
+				auth.LoginUser(username, password)
+				//schedule montior and connect to server
+				s := gocron.NewScheduler()
+				s.Every(30).Seconds().Do(api.SendData)
+				<-s.Start()
+
+				return nil
 			},
 		},
 	}
@@ -182,10 +190,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	
-
 }
 
+/*
+* run containers in the provided type set
+* @returns error if not null
+* @params dopr definition object
+* @object ref definition object
+ */
 func runContainers(config validation.Dopr) error {
 	// var cmd
 	for _, image := range config.Services {
@@ -195,9 +207,9 @@ func runContainers(config validation.Dopr) error {
 			Repository: image.Artifact_registry_repository,
 			Source:     image.Artifact_source,
 			Ports:      image.Artifact_ports,
-			// Enviroment: image.Artifact_enviroment_variables,
-			// Policies:   image.Artifact_enviroment_variables,
+			Enviroment: image.Artifact_enviroment_variables,
 		}
+		//build artifacts while outputing stdout
 		stdnWriter(imageBuild.BuildContainer(config.Services_name))
 	}
 	for _, container := range config.Services {
@@ -207,9 +219,9 @@ func runContainers(config validation.Dopr) error {
 			Repository: container.Artifact_registry_repository,
 			Source:     container.Artifact_source,
 			Ports:      container.Artifact_ports,
-			// Enviroment: image.Artifact_enviroment_variables,
-			// Policies:   image.Artifact_enviroment_variables,
+			Enviroment: image.Artifact_enviroment_variables,
 		}
+		//run artifact containers while outputting to stdout
 		stdnWriter(containerBuild.RunContainer(config.Services_name))
 	}
 	for _, container := range config.Services {
@@ -219,15 +231,16 @@ func runContainers(config validation.Dopr) error {
 			Repository: container.Artifact_registry_repository,
 			Source:     container.Artifact_source,
 			Ports:      container.Artifact_ports,
-			// Enviroment: image.Artifact_enviroment_variables,
-			// Policies:   image.Artifact_enviroment_variables,
+			Enviroment: image.Artifact_enviroment_variables,
 		}
+		//check if container is running foreal
 		containerBuild.CheckIfContainerRunning(config.Services_name, "running")
 	}
 	return nil
 }
 
-func getWD()(error, string){
+//get current working directory
+func getWD() (error, string) {
 
 	dir, err := os.Getwd()
 	if err != nil {
@@ -245,8 +258,7 @@ func stopContainers(config validation.Dopr) error {
 			Repository: image.Artifact_registry_repository,
 			Source:     image.Artifact_source,
 			Ports:      image.Artifact_ports,
-			// Enviroment: image.Artifact_enviroment_variables,
-			// Policies:   image.Artifact_enviroment_variables,
+			Enviroment: image.Artifact_enviroment_variables,
 		}
 		stdnWriter(imageBuild.StopContainer(config.Services_name))
 	}
@@ -258,8 +270,7 @@ func stopContainers(config validation.Dopr) error {
 			Repository: container.Artifact_registry_repository,
 			Source:     container.Artifact_source,
 			Ports:      container.Artifact_ports,
-			// Enviroment: image.Artifact_enviroment_variables,
-			// Policies:   image.Artifact_enviroment_variables,
+			Enviroment: image.Artifact_enviroment_variables,
 		}
 		containerBuild.CheckIfContainerRunning(config.Services_name, "stopped")
 	}
