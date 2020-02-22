@@ -13,13 +13,10 @@ type Definition struct {
 	Repository string
 	Source     string
 	Ports      []string
-	Enviroment []KeyVal
+	Environment EnvironmentVals
 }
 
-type KeyVal struct {
-	Key   string
-	Value string
-}
+type EnvironmentVals map[string]interface{}
 
 /*
 * build passed container map one after another from defined loop
@@ -54,12 +51,12 @@ func (image *Definition) RunContainer(Services_name string) *exec.Cmd {
 	color.Unset()
 
 	var cmd *exec.Cmd
-	portsToRun := containerCommand(image.Ports)
+	commandToRun := containerCommand(image)
 	if image.Type == "build" {
-		commandTr := append(portsToRun, "--name", Services_name+"_"+image.Name, Services_name+"."+image.Name)
+		commandTr := append(commandToRun, "--name", Services_name+"_"+image.Name, Services_name+"."+image.Name)
 		cmd = exec.Command("docker", commandTr...)
 	} else if image.Type == "service" {
-		commandTr := append(portsToRun, "--name", Services_name+"_"+image.Name, image.Source)
+		commandTr := append(commandToRun, "--name", Services_name+"_"+image.Name, image.Source)
 		cmd = exec.Command("docker", commandTr...)
 	}
 	return cmd
@@ -102,13 +99,23 @@ func (image *Definition) StopContainer(Services_name string) *exec.Cmd {
 	return cmd
 }
 
-func containerCommand(ports []string) []string {
-	containerToRun := []string{"run", "-d"}
-	if len(ports) < 1 {
-		return containerToRun
+type defToAppend []string
+func containerCommand(image *Definition) []string {
+	containerToRun := defToAppend{"run", "-d"}
+	var portsToAppend defToAppend
+	var envAppend defToAppend
+	
+	//append ports to run
+	if len(image.Ports) > 1 {
+		for _, port := range image.Ports {
+			//containerToRun = append(containerToRun, "-p", port)
+			portsToAppend = append(portsToAppend, "-p", port)
+		}
 	}
-	for _, port := range ports {
-		containerToRun = append(containerToRun, "-p", port)
+	for i, env := range image.Environment{
+		envAppend = append(envAppend, "-e", fmt.Sprintf("%s=%s", i, env))
 	}
+	containerToRun = append(containerToRun, portsToAppend...)
+	containerToRun = append(containerToRun, envAppend...)
 	return containerToRun
 }

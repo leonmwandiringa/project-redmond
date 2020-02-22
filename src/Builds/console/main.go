@@ -30,14 +30,10 @@ type Artifact struct {
 	Artifact_registry_repository  string   `json:"artifact_registry_repository"`
 	Artifact_source               string   `json:"artifact_source"`
 	Artifact_ports                []string `json:"artifact_ports"`
-	Artifact_enviroment_variables []KeyVal `json:"artifact_enviroment_variables"`
-	Artifact_policies             []KeyVal `json:"artifact_enviroment_policies"`
+	Artifact_environment_variables EnvironmentVals `json:"artifact_environment_variables"`
 }
 
-type KeyVal struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
+type EnvironmentVals map[string]interface{}
 
 //////////
 func main() {
@@ -207,7 +203,7 @@ func runContainers(config validation.Dopr) error {
 			Repository: image.Artifact_registry_repository,
 			Source:     image.Artifact_source,
 			Ports:      image.Artifact_ports,
-			Enviroment: image.Artifact_enviroment_variables,
+			Environment: image.Artifact_environment_variables,
 		}
 		//build artifacts while outputing stdout
 		stdnWriter(imageBuild.BuildContainer(config.Services_name))
@@ -219,7 +215,7 @@ func runContainers(config validation.Dopr) error {
 			Repository: container.Artifact_registry_repository,
 			Source:     container.Artifact_source,
 			Ports:      container.Artifact_ports,
-			Enviroment: image.Artifact_enviroment_variables,
+			Environment: container.Artifact_environment_variables,
 		}
 		//run artifact containers while outputting to stdout
 		stdnWriter(containerBuild.RunContainer(config.Services_name))
@@ -231,7 +227,7 @@ func runContainers(config validation.Dopr) error {
 			Repository: container.Artifact_registry_repository,
 			Source:     container.Artifact_source,
 			Ports:      container.Artifact_ports,
-			Enviroment: image.Artifact_enviroment_variables,
+			Environment: container.Artifact_environment_variables,
 		}
 		//check if container is running foreal
 		containerBuild.CheckIfContainerRunning(config.Services_name, "running")
@@ -258,7 +254,7 @@ func stopContainers(config validation.Dopr) error {
 			Repository: image.Artifact_registry_repository,
 			Source:     image.Artifact_source,
 			Ports:      image.Artifact_ports,
-			Enviroment: image.Artifact_enviroment_variables,
+			Environment: image.Artifact_environment_variables,
 		}
 		stdnWriter(imageBuild.StopContainer(config.Services_name))
 	}
@@ -270,7 +266,7 @@ func stopContainers(config validation.Dopr) error {
 			Repository: container.Artifact_registry_repository,
 			Source:     container.Artifact_source,
 			Ports:      container.Artifact_ports,
-			Enviroment: image.Artifact_enviroment_variables,
+			Environment: container.Artifact_environment_variables,
 		}
 		containerBuild.CheckIfContainerRunning(config.Services_name, "stopped")
 	}
