@@ -25,10 +25,10 @@ type Artifact struct {
 	Artifact_registry_repository  string   `json:"artifact_registry_repository"`
 	Artifact_source               string   `json:"artifact_source"`
 	Artifact_ports                []string `json:"artifact_ports"`
-	Artifact_environment_variables EnvironmentVals `json:"artifact_environment_variables"`
+	Artifact_environment_variables map[string]interface{} `json:"artifact_environment_variables"`
 }
 
-type EnvironmentVals map[string]interface{}
+//type EnvironmentVals map[string]interface{}
 
 //check if docker is installed.
 //its the only required prerequisite

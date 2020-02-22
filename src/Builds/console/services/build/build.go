@@ -13,10 +13,10 @@ type Definition struct {
 	Repository string
 	Source     string
 	Ports      []string
-	Environment EnvironmentVals
+	Environment map[string]interface{}
 }
 
-type EnvironmentVals map[string]interface{}
+//type EnvironmentVals map[string]interface{}
 
 /*
 * build passed container map one after another from defined loop
