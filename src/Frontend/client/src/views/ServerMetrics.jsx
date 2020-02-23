@@ -67,6 +67,29 @@ class Dashboard extends React.Component {
     this.setState({loading: false})
   }
 
+  async serverExecution(resource, action){
+    try {
+      var data;
+      var token = auth.getToken();
+      this.setState({loading: true})
+
+      let response = await axios.post(`${CONSTANTS.baseUrl}/api/v1/server-execution/`, {
+        server_name: this.state.data.server_name,
+        target: "CONTAINER",
+        instruction: {
+          container_name: resource.Name.slice(1),
+          container_id: resource.Id,
+          action: action
+        },
+        requested_at: Date.now(),
+      }, {headers: { Authorization: `Bearer ${token}` }});
+      response.data.status || response.data.data ? this.setState({data: response.data.data}) : this.setState({data: null}) 
+    } catch(error){
+      this.setState({notification:{status: "danger", message: error.response.data.message}, loading: false});
+    }
+    this.setState({loading: false})
+  }
+
   async componentDidMount(){
     const { server } = this.props.match.params
     this.setState({server: server})
@@ -84,7 +107,17 @@ class Dashboard extends React.Component {
           <th>{val.Config.Image}</th>
           <th>{(new Date(val.State.StartedAt)).toLocaleString()}</th>
           <th>{val.State.Running == true ? "Running" : (val.State.Restarting == true ? "Restarting" : "Stopped")}</th>
-          <th>Ations</th>
+          <th>
+                <Button className="btn-icon" color="info" size="sm" onClick={()=>{this.serverExecution(val, "STOP")}} disabled={val.State.Running == false || val.State.Restarting == true}>
+                    <i className="fa fa-power-off"></i>
+                </Button>{` `}
+                <Button className="btn-icon" color="success" size="sm" onClick={()=>{this.serverExecution(val, "START")}} disabled={val.State.Running == true || val.State.Restarting == true}>
+                    <i className="fa fa-play"></i>
+                </Button>{` `}
+                <Button className="btn-icon" color="danger" size="sm" onClick={()=>{this.serverExecution(val, "RESTART")}} disabled={val.State.Restarting == true}>
+                    <i className="fa fa-redo" />
+                </Button>
+          </th>
         </tr>)
       })
     })
