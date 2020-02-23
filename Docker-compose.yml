@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  rabbitmq:
+  rabbitmq.service:
     image: rabbitmq:3-management
     container_name: DOPR_Rabbitmq
     ports:
@@ -17,7 +17,7 @@ services:
     networks:
       - dopr
 
-  frontend:
+  frontend.client:
     build:
       context: src/Frontend/client
     container_name: DOPR_API_Frontend
@@ -29,7 +29,7 @@ services:
     networks:
       - dopr
 
-  apigateway:
+  apigateway.api:
     build:
       context: src/Services/apigateway
     container_name: DOPR_API_Gateway
@@ -41,7 +41,7 @@ services:
     networks:
       - dopr
     
-  metrics-evd:
+  metrics-evd.api:
     build:
       context: src/Services/metrics-evd
     container_name: DOPR_Metrics_Evd
@@ -51,7 +51,7 @@ services:
     networks:
       - dopr
     
-  metrics-rest:
+  metrics-rest.api:
     build:
       context: src/Services/metrics-rest
     container_name: DOPR_Metrics_Rest
@@ -61,10 +61,20 @@ services:
     networks:
       - dopr
 
-  metrics-worker:
+  metrics-worker.background:
     build:
       context: src/Services/metrics-worker
     container_name: DOPR_Metrics_Worker
+    restart: always
+    networks:
+      - dopr
+
+  server-execution.api:
+    build:
+      context: src/Services/server-execution
+    container_name: DOPR_Server_Execution
+    ports:
+      - "5003:5003"
     restart: always
     networks:
       - dopr

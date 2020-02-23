@@ -7,7 +7,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "metrics-evd",
+          "Host": "metrics-evd.api",
           "Port": 5001
         }
       ],
@@ -27,8 +27,28 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "metrics-rest",
+          "Host": "metrics-rest.api",
           "Port": 5002
+        }
+      ],
+      "ReRouteIsCaseSensitive": false,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "fgHGHGFHh47g344ryft6HGFH789khgfheriHH9384fkdfGFHFtkvjjhkgfSRHGFHGqw56yEFH",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "UserId": "Claims[jti] > value[1]"
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/v1/server-execution/{serverExecution}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Head", "Options", "Put", "Delete" ],
+      "DownstreamPathTemplate": "/{serverExecution}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "server-execution.api",
+          "Port": 5003
         }
       ],
       "ReRouteIsCaseSensitive": false,
