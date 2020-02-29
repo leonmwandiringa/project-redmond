@@ -3,9 +3,11 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/streadway/amqp"
 	"log"
 	"time"
+
+	"github.com/dopr/metrics/data"
+	"github.com/streadway/amqp"
 )
 
 func failOnError(err error, msg string) {
@@ -17,13 +19,13 @@ func failOnError(err error, msg string) {
 
 var (
 	conn *amqp.Connection
-	ch *amqp.Channel
+	ch   *amqp.Channel
 )
 
 func InitAmqp() {
 	var err error
 
-	conn, err = amqp.Dial("amqp://dopr_rabbit_admin:0dsaoFl6tdsfw0d43d@rabbitmq.service")
+	conn, err = amqp.Dial(data.GetEnvVariable("RABBITMQ_CONNECTION_STRING"))
 	// conn, err = amqp.Dial("amqp://dopr_rabbit_admin:0dsaoFl6tdsfw0d43d@localhost")
 
 	failOnError(err, "Failed to connect to RabbitMQ")
@@ -33,12 +35,12 @@ func InitAmqp() {
 
 	err = ch.ExchangeDeclare(
 		"dopr-server-metrics", // name
-		"direct",                           // type
-		true,                               // durable
-		false,                              // auto-deleted
-		false,                              // internal
-		false,                              // noWait
-		nil,                                // arguments
+		"direct",              // type
+		true,                  // durable
+		false,                 // auto-deleted
+		false,                 // internal
+		false,                 // noWait
+		nil,                   // arguments
 	)
 	failOnError(err, "Failed to declare the Exchange")
 
@@ -57,9 +59,9 @@ func PublishAmqpMessage(data interface{}, userId string) {
 	payload, _ := json.Marshal(dataObj)
 	err := ch.Publish(
 		"dopr-server-metrics", // exchange
-		"metrics",                // routing key
-		false,                              // mandatory
-		false,                              // immediate
+		"metrics",             // routing key
+		false,                 // mandatory
+		false,                 // immediate
 		amqp.Publishing{
 			DeliveryMode: amqp.Transient,
 			ContentType:  "application/json",

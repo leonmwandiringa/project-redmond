@@ -13,6 +13,7 @@ namespace api_gateway
     public class Program
     {
         public static readonly string AspUrl = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPNETCORE_URLS")) ? "http://*:5000" : Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+        public static readonly string AspEnv = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")) ? "Development" : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         public static void Main(string[] args)
         {
             CreateWebHostBuilder(args).Build().Run();
@@ -23,7 +24,7 @@ namespace api_gateway
                 .UseUrls(AspUrl)
                 .ConfigureAppConfiguration((host, config) =>
                 {
-                    config.AddJsonFile("ocelot.json");
+                    config.AddJsonFile($"ocelot.{AspEnv}.json");
                 })
                 .UseStartup<Startup>();
     }

@@ -1,10 +1,11 @@
 let Influx = require("influx");
+let env = require("./config");
 const influx= new Influx.InfluxDB({
-    host: 'localhost',
-    database: 'doprstats',
-    username: "admin",
-    password: "SuperDopr102G", 
-    port:8086,
+    host: env.INFLUX_HOST,
+    database: env.INFLUX_DATABASE,
+    username: env.INFLUX_USERNAME,
+    password: env.INFLUX_PASSWORD, 
+    port:env.INFLUX_PORT,
     schema: [
         {
           measurement: 'stats',
@@ -18,8 +19,8 @@ class InfluxDb{
         influx.getDatabaseNames()
         .then(names=>{
             console.log(names)
-            if(names.indexOf('doprstats') == -1){
-                return influx.createDatabase('doprstats');
+            if(names.indexOf(env.INFLUX_DATABASE) == -1){
+                return influx.createDatabase(env.INFLUX_DATABASE);
             }
         });
     }

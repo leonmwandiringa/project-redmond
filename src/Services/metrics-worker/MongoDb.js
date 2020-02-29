@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://dopr:Dopr101@ds211099.mlab.com:11099/dopr-resources', {useNewUrlParser: true});
+let env = require("./config");
+mongoose.connect(env.MONGO_TEST, {useNewUrlParser: true});
 
 const UserContainers = mongoose.model('UserContainers', new mongoose.Schema({
     user_id: String,

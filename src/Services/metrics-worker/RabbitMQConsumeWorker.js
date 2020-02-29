@@ -1,5 +1,6 @@
 var amqp = require('amqplib');
-let CONN_URL = `amqp://dopr_rabbit_admin:0dsaoFl6tdsfw0d43d@rabbitmq.service:5672`;
+let env = require("./config");
+let CONN_URL = env.RABBITMQ_CONNECTION_STRING;
 // let CONN_URL = `amqp://dopr_rabbit_admin:0dsaoFl6tdsfw0d43d@localhost:5672`;
 
 //let influx = require("./InfluxDB");

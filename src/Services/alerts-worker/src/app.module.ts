@@ -4,7 +4,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 @Module({
   imports: [
     AlertModule,
-    MongooseModule.forRoot('mongodb://dopr:Dopr101@ds211099.mlab.com:11099/dopr-resources', { useNewUrlParser: true })
+    MongooseModule.forRoot(process.env.MONGO_TEST, { useNewUrlParser: true })
   ],
   controllers: [],
   providers: [],

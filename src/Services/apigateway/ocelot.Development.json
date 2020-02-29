@@ -1,0 +1,67 @@
+{
+  "ReRoutes": [
+    {
+      "UpstreamPathTemplate": "/api/v1/data/{metrics}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Head", "Options", "Put", "Delete" ],
+      "DownstreamPathTemplate": "/{metrics}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "ReRouteIsCaseSensitive": false,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "fgHGHGFHh47g344ryft6HGFH789khgfheriHH9384fkdfGFHFtkvjjhkgfSRHGFHGqw56yEFH",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "UserId": "Claims[jti] > value[1]"
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/v1/stats/{metricStat}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Head", "Options", "Put", "Delete" ],
+      "DownstreamPathTemplate": "/{metricStat}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ],
+      "ReRouteIsCaseSensitive": false,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "fgHGHGFHh47g344ryft6HGFH789khgfheriHH9384fkdfGFHFtkvjjhkgfSRHGFHGqw56yEFH",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "UserId": "Claims[jti] > value[1]"
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/v1/server-execution/{serverExecution}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Head", "Options", "Put", "Delete" ],
+      "DownstreamPathTemplate": "/{serverExecution}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5003
+        }
+      ],
+      "ReRouteIsCaseSensitive": false,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "fgHGHGFHh47g344ryft6HGFH789khgfheriHH9384fkdfGFHFtkvjjhkgfSRHGFHGqw56yEFH",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "UserId": "Claims[jti] > value[1]"
+      }
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5000"
+  }
+}

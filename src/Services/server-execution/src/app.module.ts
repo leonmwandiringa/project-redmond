@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ExecutionModule } from "./executions/execution.module";
 import { MongooseModule } from "@nestjs/mongoose";
+import { MONGO_TEST } from  '../config.js';
+
 @Module({
   imports: [
     ExecutionModule,
-    MongooseModule.forRoot('mongodb://dopr:Dopr101@ds059898.mlab.com:59898/dopr-executions', { useNewUrlParser: true })
+    MongooseModule.forRoot(MONGO_TEST, { useNewUrlParser: true })
   ],
   controllers: [],
   providers: [],
