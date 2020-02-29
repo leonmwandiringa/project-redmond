@@ -20,7 +20,8 @@ export class ExecutionService{
         if(executionIsAlreadyInQueue){
             return {
                 status: false,
-                message: "Instruction has already been sent to server"
+                message: "Instruction has already been sent to server",
+                data: payload
             }
         }
 
@@ -34,7 +35,8 @@ export class ExecutionService{
         await executionSaved.save();
         return {
             status: true,
-            message: "Instruction was successfully queue to run in the next server command"
+            message: "Instruction was successfully queue to run in the next server command",
+            data: executionSaved
         }
     }
 

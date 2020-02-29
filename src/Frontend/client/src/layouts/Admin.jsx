@@ -77,16 +77,13 @@ class Admin extends React.Component {
     this.setState({ backgroundColor: color });
   };
   getBrandText = path => {
+    let thisPath = path.trim().slice(1).split("/")[1];
     for (let i = 0; i < routes.length; i++) {
-      if (
-        this.props.location.pathname.indexOf(
-          routes[i].layout + routes[i].path
-        ) !== -1
-      ) {
-        return routes[i].name;
+      if("/"+routes[i].path.slice(1).split("/")[0] == "/"+thisPath){
+        return routes[i].name
       }
     }
-    return "Brand";
+    return "Dopr";
   };
   render() {
     return (

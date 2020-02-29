@@ -16,7 +16,7 @@ export class ExecutionController{
             error: executionResult.status ? null : executionResult.message,
             message: executionResult.message,
             status: executionResult.status,
-            data: {}
+            data: executionResult.data
         });
     }
 

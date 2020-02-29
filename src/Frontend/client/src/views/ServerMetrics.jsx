@@ -12,13 +12,7 @@ import {
   CardHeader,
   CardBody,
   CardTitle,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
-  UncontrolledDropdown,
-  Label,
-  FormGroup,
-  Input,
+  Alert,
   Table,
   Row,
   Col,
@@ -28,14 +22,6 @@ import * as axios from "axios";
 import auth from "../common/auth";
 import {CONSTANTS} from "../env";
 
-// core components
-import {
-  chartExample1,
-  chartExample2,
-  chartExample3,
-  chartExample4
-} from "variables/charts.jsx";
-
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
@@ -43,7 +29,12 @@ class Dashboard extends React.Component {
       bigChartData: "data1",
       data: null,
       server: null,
-      containers: null
+      containers: null,
+      loading: false,
+      notification: {
+        status: null,
+        message: null
+      },
     };
   }
   setBgChartData = name => {
@@ -69,11 +60,10 @@ class Dashboard extends React.Component {
 
   async serverExecution(resource, action){
     try {
-      var data;
       var token = auth.getToken();
       this.setState({loading: true})
 
-      let response = await axios.post(`${CONSTANTS.baseUrl}/api/v1/server-execution/`, {
+      let response = await axios.post(`${CONSTANTS.baseUrl}/api/v1/server-execution/execution`, {
         server_name: this.state.data.server_name,
         target: "CONTAINER",
         instruction: {
@@ -83,11 +73,18 @@ class Dashboard extends React.Component {
         },
         requested_at: Date.now(),
       }, {headers: { Authorization: `Bearer ${token}` }});
-      response.data.status || response.data.data ? this.setState({data: response.data.data}) : this.setState({data: null}) 
+
+      this.setState({notification:{status: response.data.status ? "success" : "danger", message: response.data.message+" "+response.data.data.server_name}, loading: false});
+      
     } catch(error){
+      console.log(error)
       this.setState({notification:{status: "danger", message: error.response.data.message}, loading: false});
     }
     this.setState({loading: false})
+    setTimeout(()=>{
+      this.setState({notification:{status: null, message: null}});
+    }, 5000)
+
   }
 
   async componentDidMount(){
@@ -108,13 +105,13 @@ class Dashboard extends React.Component {
           <th>{(new Date(val.State.StartedAt)).toLocaleString()}</th>
           <th>{val.State.Running == true ? "Running" : (val.State.Restarting == true ? "Restarting" : "Stopped")}</th>
           <th>
-                <Button className="btn-icon" color="info" size="sm" onClick={()=>{this.serverExecution(val, "STOP")}} disabled={val.State.Running == false || val.State.Restarting == true}>
+                <Button className="btn-icon" color="info" size="sm" onClick={()=>{return this.serverExecution(val, "STOP")}} disabled={val.State.Running == false || val.State.Restarting == true}>
                     <i className="fa fa-power-off"></i>
                 </Button>{` `}
-                <Button className="btn-icon" color="success" size="sm" onClick={()=>{this.serverExecution(val, "START")}} disabled={val.State.Running == true || val.State.Restarting == true}>
+                <Button className="btn-icon" color="success" size="sm" onClick={()=>{return this.serverExecution(val, "START")}} disabled={val.State.Running == true || val.State.Restarting == true}>
                     <i className="fa fa-play"></i>
                 </Button>{` `}
-                <Button className="btn-icon" color="danger" size="sm" onClick={()=>{this.serverExecution(val, "RESTART")}} disabled={val.State.Restarting == true}>
+                <Button className="btn-icon" color="danger" size="sm" onClick={()=>{return this.serverExecution(val, "RESTART")}} disabled={val.State.Restarting == true}>
                     <i className="fa fa-redo" />
                 </Button>
           </th>
@@ -123,10 +120,18 @@ class Dashboard extends React.Component {
     })
   }
 
+  renderNotifications(){
+    if(this.state.notification.status){
+      return (<Alert className="serverRespAlert" color={this.state.notification.status}>{this.state.notification.message}</Alert>)
+    }
+    return null
+  }
+
   render() {
     return (
       <>
         <div className="content">
+        {this.renderNotifications()}
         <Row>
             <Col xs="6">
               <Card className="card-chart">
@@ -134,9 +139,9 @@ class Dashboard extends React.Component {
                   <Row>
                       {/* <h5 className="card-category">Server Metrics</h5> */}
                       <CardTitle tag="h2">Server Details</CardTitle>
-                      <ul class="list-group">
+                      <ul class="list-group" style={{width: '100%'}}>
                         <li class="">Servername: {this.state.data ? this.state.data.server_name : ""}</li>
-                        <li class="">Last Updated: {this.state.data ? (new Date(this.state.data.metrics.time)).toLocaleString() : ""}</li>
+                        <li class="">Last Updated: {this.state.data && this.state.data.metrics.time ? (new Date(this.state.data.metrics.time)).toLocaleString() : ""}</li>
                       </ul>
                   </Row>
                 </CardHeader>

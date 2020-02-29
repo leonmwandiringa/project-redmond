@@ -57,6 +57,14 @@
 *::after {
   box-sizing: border-box; }
 
+
+.serverRespAlert{
+  position: absolute !important;
+  top: 1%;
+  left: 30%;
+  transform: 3s all;
+}
+
 html {
   font-family: sans-serif;
   line-height: 1.15;
