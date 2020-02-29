@@ -11,7 +11,7 @@ import "assets/demo/demo.css";
 import "assets/css/nucleo-icons.css";
 
 const hist = createBrowserHistory();
-
+//render
 ReactDOM.render(
   <Router history={hist}>
     <Switch>

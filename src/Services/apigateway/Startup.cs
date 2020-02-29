@@ -90,13 +90,12 @@ namespace api_gateway
                     ClockSkew = TimeSpan.FromMinutes(0)
                 };
             });
-
             //ocelot and polly circuit breaker implementation
             services.AddOcelot(Configuration)
                     .AddPolly();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        //This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public async void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
@@ -105,7 +104,6 @@ namespace api_gateway
             }
             else
             {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                // app.UseHsts();
             }
 

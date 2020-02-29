@@ -39,7 +39,6 @@ class UserProfile extends React.Component {
       await this.submitUpdate()
   }
 
-
   async submitUpdate(){
 
     var cid = this.state.user.id

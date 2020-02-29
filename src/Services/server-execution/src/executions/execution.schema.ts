@@ -12,3 +12,4 @@ export const ExecutionSchema: Schema = new Schema({
     },
     satisfied_at: Date
 }, {timestamps: true, strict: false});
+

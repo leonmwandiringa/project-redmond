@@ -1,7 +1,7 @@
 {
-  "name": "metrics-rest",
+  "name": "server-execution",
   "version": "0.0.1",
-  "description": "",
+  "description": "executio",
   "author": "Leon mwandiringa",
   "license": "MIT",
   "scripts": {

@@ -43,5 +43,4 @@ namespace api_gateway.Services
             return publicToken;
         }
     }
-
 }

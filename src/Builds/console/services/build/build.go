@@ -17,7 +17,7 @@ type Definition struct {
 }
 
 //type EnvironmentVals map[string]interface{}
-
+ 
 /*
 * build passed container map one after another from defined loop
 * @returns exec.cmd memory address - commandline reults stream to stdoutput
