@@ -30,6 +30,7 @@ export class ExecutionService{
                                 target: payload.target,
                                 instruction: payload.instruction,
                                 satisfied: false,
+                                requested_at: payload.requested_at,
                                 server_name: payload.server_name
                             });
         await executionSaved.save();
@@ -38,6 +39,10 @@ export class ExecutionService{
             message: "Instruction was successfully queue to run in the next server command",
             data: executionSaved
         }
+    }
+
+    async getServerExecutions(userid, servername){
+        return await this._execution.find({user_id: userid, server_name: servername}).exec();
     }
 
 }

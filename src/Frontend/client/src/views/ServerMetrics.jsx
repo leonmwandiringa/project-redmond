@@ -1,6 +1,6 @@
 import React from "react";
 // nodejs library that concatenates classes
-import classNames from "classnames";
+import classnames from "classnames";
 // react plugin used to create charts
 import { Line, Bar } from "react-chartjs-2";
 
@@ -16,7 +16,11 @@ import {
   Table,
   Row,
   Col,
-  UncontrolledTooltip
+  Nav, 
+  NavItem,
+  NavLink,
+  TabPane,
+  TabContent
 } from "reactstrap";
 import * as axios from "axios";
 import auth from "../common/auth";
@@ -29,7 +33,10 @@ class Dashboard extends React.Component {
       bigChartData: "data1",
       data: null,
       server: null,
+      serverExecutions: null,
       containers: null,
+      pills: 1,
+      executions: null,
       loading: false,
       notification: {
         status: null,
@@ -37,10 +44,10 @@ class Dashboard extends React.Component {
       },
     };
   }
-  setBgChartData = name => {
+  toggleTabs = (e, stateName, index) => {
+    e.preventDefault();
     this.setState({
-      bigChartData: name,
-      data: null
+      [stateName]: index
     });
   };
 
@@ -54,6 +61,21 @@ class Dashboard extends React.Component {
         response.data.status || response.data.data ? this.setState({data: response.data.data}) : this.setState({data: null}) 
     } catch(error){
       this.setState({notification:{status: "danger", message: error.response.data.message}, loading: false});
+    }
+    this.setState({loading: false})
+  }
+
+  async getServerExecitions(server){
+    try {
+        var data;
+        var token = auth.getToken();
+        this.setState({loading: true})
+
+        let response = await axios.get(`${CONSTANTS.baseUrl}/api/v1/server-execution/execution/${server}`, {headers: { Authorization: `Bearer ${token}` }});
+        response.data.status || response.data.data ? this.setState({serverExecutions: response.data.data}) : this.setState({serverExecutions: null}) 
+        console.log(response.data)
+    } catch(error){
+      console.log(error)
     }
     this.setState({loading: false})
   }
@@ -90,15 +112,36 @@ class Dashboard extends React.Component {
   async componentDidMount(){
     const { server } = this.props.match.params
     this.setState({server: server})
+    await this.getServerExecitions(server)
     await this.getUserServer(server)
     await this.renderContainers()
+    await this.renderServerExecutions()
+  }
+
+  async renderServerExecutions(){
+    console.log(this.state.serverExecutions)
+    let executions = this.state.serverExecutions
+    this.setState({executions: executions.map((val, index)=>{
+        return (<tr key={"exec-"+val._id}>
+          <th>{val.instruction.container_id.slice(0, 10)}</th>
+          <th>{val.instruction.container_name}</th>
+          <th>{val.instruction.action}</th>
+          <th>{(new Date(val.createdAt)).toLocaleString()}</th>
+          <th>{String(val.satisfied)}</th>
+          <th>
+                <Button className="btn-icon" color="danger" size="sm" onClick={()=>{console.log("stopping command")}} disabled={val.satisfied}>
+                    <i className="fa fa-times"></i>
+                </Button>{` `}
+          </th>
+        </tr>)
+      })
+    })
   }
 
   async renderContainers(){
-    console.log(this.state.data.metrics.data)
     let containers = this.state.data.metrics.data
     this.setState({containers: containers.map((val, index)=>{
-        return (<tr key={val.Id}>
+        return (<tr key={"container-"+val.Id}>
           <th>{"" || val.Id.slice(0, 10)}</th>
           <th>{val.Name.slice(1)}</th>
           <th>{val.Config.Image}</th>
@@ -188,6 +231,83 @@ class Dashboard extends React.Component {
                       {this.state.containers}
                     </tbody>
                   </Table>
+                </CardBody>
+              </Card>
+            </Col>
+          </Row>
+          <Row>
+            <Col lg="12" md="12">
+              <Card>
+                <CardBody>
+                  <Nav className="nav-pills-primary" pills role="tablist" style={{margin: '0 10px 30px 0', paddingBottom: '10px',borderBottom: '1px solid'}}>
+                    <NavItem>
+                      <NavLink
+                        className={classnames({
+                          active: this.state.pills === 1
+                        })}
+                        onClick={e => this.toggleTabs(e, "pills", 1)}
+                        href="#pablo"
+                      >
+                        Commands
+                      </NavLink>
+                    </NavItem>
+                    <NavItem>
+                      <NavLink
+                        className={classnames({
+                          active: this.state.pills === 2
+                        })}
+                        onClick={e => this.toggleTabs(e, "pills", 2)}
+                        href="#pablo"
+                      >
+                        Alerts
+                      </NavLink>
+                    </NavItem>
+                  </Nav>
+                  <TabContent className="tab-space" activeTab={"pills" + this.state.pills}>
+                    <TabPane tabId="pills1">
+                              <Table className="tablesorter" responsive>
+                                <thead className="text-primary">
+                                  <tr>
+                                    <th>Container ID</th>
+                                    <th>Container Name</th>
+                                    
+                                    <th>Command</th>
+                                    <th>Sent At</th>
+                                    <th>Satisfied</th>
+                                    
+                                    <th>Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {this.state.executions}
+                                </tbody>
+                              </Table>
+                    </TabPane>
+                    <TabPane tabId="pills2">
+                        
+                              <Table className="tablesorter" responsive>
+                                <thead className="text-primary">
+                                  <tr>
+                                    <th>Container ID</th>
+                                    <th>Container Name</th>
+                                    <th>Alert Type</th>
+                                    <th>Alert Counter</th>
+                                    <th>Actions</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <th>Container ID</th>
+                                    <th>Container Name</th>
+                                    <th>Alert Type</th>
+                                    <th>Alert Counter</th>
+                                    <th>Actions</th>
+                                  </tr>
+                                </tbody>
+                              </Table>
+                        
+                    </TabPane>
+                  </TabContent>
                 </CardBody>
               </Card>
             </Col>
