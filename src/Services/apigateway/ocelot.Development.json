@@ -59,6 +59,26 @@
       "AddHeadersToRequest": {
         "UserId": "Claims[jti] > value[1]"
       }
+    },
+    {
+      "UpstreamPathTemplate": "/api/v1/server-alerts/{serverAlert}",
+      "UpstreamHttpMethod": [ "Get", "Post", "Head", "Options", "Put", "Delete" ],
+      "DownstreamPathTemplate": "/{serverAlert}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5004
+        }
+      ],
+      "ReRouteIsCaseSensitive": false,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "fgHGHGFHh47g344ryft6HGFH789khgfheriHH9384fkdfGFHFtkvjjhkgfSRHGFHGqw56yEFH",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "UserId": "Claims[jti] > value[1]"
+      }
     }
   ],
   "GlobalConfiguration": {

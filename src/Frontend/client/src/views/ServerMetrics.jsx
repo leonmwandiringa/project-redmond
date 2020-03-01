@@ -42,6 +42,7 @@ class Dashboard extends React.Component {
         status: null,
         message: null
       },
+      alertModal:false
     };
   }
   toggleTabs = (e, stateName, index) => {
@@ -118,6 +119,12 @@ class Dashboard extends React.Component {
     await this.renderServerExecutions()
   }
 
+  async toggleAlertModal(){
+    this.setState({
+        alertModal: !this.state.alertModal
+    });
+  }
+
   async renderServerExecutions(){
     console.log(this.state.serverExecutions)
     let executions = this.state.serverExecutions
@@ -156,6 +163,9 @@ class Dashboard extends React.Component {
                 </Button>{` `}
                 <Button className="btn-icon" color="danger" size="sm" onClick={()=>{return this.serverExecution(val, "RESTART")}} disabled={val.State.Restarting == true}>
                     <i className="fa fa-redo" />
+                </Button>
+                <Button className="btn-icon" color="warning" size="md" onClick={()=>{return this.toggleAlertModal()}}>
+                    <i className="fa fa-bell" />
                 </Button>
           </th>
         </tr>)
@@ -312,6 +322,34 @@ class Dashboard extends React.Component {
               </Card>
             </Col>
           </Row>
+
+            <Modal isOpen={this.state.alertModal} toggle={this.toggleAlertModal}>
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">
+                  Add Server Alert
+                </h5>
+                <button
+                  type="button"
+                  className="close"
+                  data-dismiss="modal"
+                  aria-hidden="true"
+                  onClick={this.toggleAlertModal}
+                >
+                  <i className="tim-icons icon-simple-remove" />
+                </button>
+              </div>
+              <ModalBody>
+                  <p>Woohoo, you're reading this text in a modal!</p>
+              </ModalBody>
+              <ModalFooter>
+                  <Button color="secondary" onClick={this.toggleAlertModal}>
+                      Close
+                  </Button>
+                  <Button color="primary">
+                      Submit Alert
+                  </Button>
+              </ModalFooter>
+            </Modal>
         </div>
       </>
     );

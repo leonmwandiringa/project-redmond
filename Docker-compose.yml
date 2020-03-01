@@ -80,6 +80,16 @@ services:
     networks:
       - dopr
 
+  server-alerts.api:
+    build:
+      context: src/Services/server-alerts
+    container_name: DOPR_Server_Alerts
+    ports:
+      - "5004:5004"
+    restart: always
+    networks:
+      - dopr
+
 
 networks:
   dopr:
