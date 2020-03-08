@@ -15,6 +15,9 @@ import {
   Alert,
   Table,
   Row,
+  Modal,
+  ModalFooter,
+  ModalBody,
   Col,
   Nav, 
   NavItem,
@@ -107,7 +110,34 @@ class Dashboard extends React.Component {
     setTimeout(()=>{
       this.setState({notification:{status: null, message: null}});
     }, 5000)
+  }
 
+  async serverAlert(resource, action){
+    try {
+      var token = auth.getToken();
+      this.setState({loading: true})
+
+      let response = await axios.post(`${CONSTANTS.baseUrl}/api/v1/server-alerts/alert`, {
+        server_name: this.state.data.server_name,
+        target: "CONTAINER",
+        instruction: {
+          container_name: resource.Name.slice(1),
+          container_id: resource.Id,
+          action: action
+        },
+        requested_at: Date.now(),
+      }, {headers: { Authorization: `Bearer ${token}` }});
+
+      this.setState({notification:{status: response.data.status ? "success" : "danger", message: response.data.message+" "+response.data.data.server_name}, loading: false});
+      
+    } catch(error){
+      console.log(error)
+      this.setState({notification:{status: "danger", message: error.response.data.message}, loading: false});
+    }
+    this.setState({loading: false})
+    setTimeout(()=>{
+      this.setState({notification:{status: null, message: null}});
+    }, 5000)
   }
 
   async componentDidMount(){
@@ -323,7 +353,7 @@ class Dashboard extends React.Component {
             </Col>
           </Row>
 
-            <Modal isOpen={this.state.alertModal} toggle={this.toggleAlertModal}>
+            <Modal isOpen={this.state.alertModal} toggle={()=>{this.toggleAlertModal()}}>
               <div className="modal-header">
                 <h5 className="modal-title" id="exampleModalLabel">
                   Add Server Alert
@@ -333,7 +363,7 @@ class Dashboard extends React.Component {
                   className="close"
                   data-dismiss="modal"
                   aria-hidden="true"
-                  onClick={this.toggleAlertModal}
+                  onClick={()=>{this.toggleAlertModal()}}
                 >
                   <i className="tim-icons icon-simple-remove" />
                 </button>
@@ -342,7 +372,7 @@ class Dashboard extends React.Component {
                   <p>Woohoo, you're reading this text in a modal!</p>
               </ModalBody>
               <ModalFooter>
-                  <Button color="secondary" onClick={this.toggleAlertModal}>
+                  <Button color="secondary" onClick={()=>{this.toggleAlertModal()}}>
                       Close
                   </Button>
                   <Button color="primary">
