@@ -1,0 +1,7 @@
+version: '1.0'
+
+artifacts:
+  frontend:
+    folder: /
+    container_name: DOPR_API_Frontend
+    image_name: dopr_frontend.client

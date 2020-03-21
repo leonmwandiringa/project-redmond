@@ -18,7 +18,6 @@ import {
 import { Link, Redirect } from "react-router-dom";
 import * as axios from "axios";
 import auth from "../common/auth";
-
 class Login extends React.Component {
     state = {
         email: null,

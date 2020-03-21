@@ -15,8 +15,8 @@ import {
   Nav,
   Alert
 } from "reactstrap";
-import * as axios from "axios";
 
+import * as axios from "axios";
 class UserProfile extends React.Component {
 
   state = {

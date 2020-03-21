@@ -18,6 +18,9 @@ import {
 import { Link, Redirect } from "react-router-dom";
 import * as axios from "axios";
 
+
+
+
 class Register extends React.Component {
   state = {
     email: null,

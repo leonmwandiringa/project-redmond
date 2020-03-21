@@ -2,10 +2,10 @@
 FROM node:alpine as build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
-COPY package.json /app/package.json
+COPY package.json .
 RUN npm install
 RUN npm install react-scripts -g
-COPY . /app
+# COPY . /app
 RUN npm run build
 
 # Stage 2 - the production environment
